@@ -17,9 +17,6 @@ PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
                                                       topologyModel.getSpectrumModel().getUpperBandLimit(),
                                                       numBands);
 
-    qDebug() << topologyModel.getSpectrumModel().getMainsFrequency() << topologyModel.getSpectrumModel().getSamplesPerCycle() << topologyModel.getSpectrumModel().getSimulationLength();
-    qDebug() << topologyModel.getSpectrumModel().getLowerBandLimit() << topologyModel.getSpectrumModel().getUpperBandLimit() << topologyModel.getSpectrumModel().getBandResolution();
-
     PLC_Time::SetTimeModel(topologyModel.getSpectrumModel().getMainsFrequency(),
                            topologyModel.getSpectrumModel().getSamplesPerCycle(),
                            Seconds(topologyModel.getSpectrumModel().getSimulationLength()));
@@ -138,8 +135,6 @@ Ptr<PLC_ValueBase> PLCTopologyLoader::valueFromFile(const QString& file, Ptr<con
         lines.pop_back();
     }
 
-    qDebug() << "File needs:" << PLC_Time::GetNumTimeslots() << "time samples and" << spectrumModel->GetNumBands() << "frequency samples";
-
     int rows = lines.length();
     int cols = lines.at(0).split(',').length();
 
@@ -169,8 +164,6 @@ Ptr<PLC_ValueBase> PLCTopologyLoader::valueFromFile(const QString& file, Ptr<con
         complexValues.push_back(currentComplexRow);
     }
 
-    qDebug() << "File Has: " << complexValues.size() << "Time Samples and" << complexValues.at(0).size();
-
     //We have half as many rows because we folded the second half into the imaginary part of complex values
     rows /= 2;
 
@@ -181,10 +174,6 @@ Ptr<PLC_ValueBase> PLCTopologyLoader::valueFromFile(const QString& file, Ptr<con
             for(int j = 0; j < cols; j++){
                 valueVector.push_back(complexValues.at(i).at(j));
             }
-        }
-
-        if(complexValues.size() > 0){
-            qDebug() << "File has " << complexValues.size() << "Time samples with " << complexValues.at(0).size() << "frequency samples";
         }
 
         //Return corresponding type

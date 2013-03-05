@@ -5,8 +5,8 @@ int main(int argc, char* argv[]){
 
     QApplication app(argc, argv);
 
-    //PLCSimulator simulator;
-    PLCSimulator simulator("./diagrams/ScenarioB.dgm");
+    PLCSimulator simulator;
+    //PLCSimulator simulator("./diagrams/ScenarioB.dgm");
     simulator.showTransferFunctions();
 
     app.exec();

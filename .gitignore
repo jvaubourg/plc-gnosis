@@ -4,7 +4,12 @@
 # exclude patterns (uncomment them if you want to use them):
 *.[oa]
 *~
-/bin/
+bin/app/*
+!bin/app/cables/
+!bin/app/data/
+!bin/app/icons/
+!bin/app/diagrams/
+
 *.prf
 *.pro.user
 Makefile
@@ -17,7 +22,4 @@ Makefile
 *.gcno
 *.gcda
 
-!/bin/app/cables/
-!/bin/app/data/
-!/bin/app/icons/
-!/bin/app/diagrams/
+
