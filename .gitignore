@@ -5,6 +5,7 @@
 *.[oa]
 *~
 bin/app/*
+bin/tmp/
 !bin/app/cables/
 !bin/app/data/
 !bin/app/icons/

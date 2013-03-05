@@ -25,9 +25,8 @@ public:
     double getReal();
     double getImaginary();
     std::complex<double> getComplex();
-    std::vector<std::vector<std::complex<double> > > getData();
-
-    QPair<int, int> contentDimensions();
+    //std::vector<std::vector<std::complex<double> > > getData();
+    //QPair<int, int> contentDimensions();
 
 private:
     QString value;

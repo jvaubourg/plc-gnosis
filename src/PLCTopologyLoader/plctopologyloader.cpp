@@ -285,33 +285,3 @@ Ptr<PLC_Node> PLCTopologyLoader::fromNodeModel(NodeModel *node, Ptr<const Spectr
     return newNode;
 }
 
-Ptr<PLC_Cable> PLCTopologyLoader::fromCableFile(QString cableName, Ptr<const SpectrumModel> spectrumModel){
-    QString cableFileName = cableName.append(".cbl");
-    cableFileName.prepend("./cables/");
-
-    QFile cableFile(cableFileName);
-    cableFile.open(QIODevice::ReadOnly);
-
-    QByteArray jsonData = cableFile.readAll();
-    QJson::Parser parser;
-
-    QVariantMap cableData = parser.parse(jsonData).toMap();
-
-
-    QString cableType = cableData["Type"].toString();
-
-    if(cableType == "FourSectorPowerSupply"){
-    }
-
-    if(cableType == "ThreeCoreConcentric"){
-
-    }
-
-    //Important**** TODO:
-    //Fix the PLC Cable models so generic 4 sector and three core are NOT pure virtual, so we can create new ones on the fly.
-    //Doing anything else than having a fixed cable type until that's done is going to be a waste of time.........
-
-    //Return a basic cable for the time being until this can get fixed.
-    return Create<PLC_NAYY150SE_Cable>(spectrumModel);
-}
-

@@ -29,9 +29,7 @@ bool PLCValueString::isValid(){
     return (validator.validate(this->value, errorPos) == QValidator::Acceptable);
 }
 
-std::vector<std::vector<std::complex<double> > > PLCValueString::getData(){
 
-}
 
 std::complex<double> PLCValueString::getComplex(){
     double real;
@@ -74,13 +72,6 @@ bool PLCValueString::isFile(){
     return (value.right(3) == "vdf");
 }
 
-QPair<int, int> PLCValueString::contentDimensions(){
-    if(!isFile()){
-        return QPair<int, int>(1, 1);
-    }
-
-
-}
 
 PLCValueStringValidator::PLCValueStringValidator(QObject *parent)
     : QValidator(parent){}

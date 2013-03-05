@@ -31,7 +31,6 @@ public:
     static Ptr<PLC_ValueBase>   valueFromFile(const QString& file, Ptr<const SpectrumModel> spectrumModel);
     static Ptr<PLC_ConstValue>  constFromValueString(PLCValueString value, Ptr<const SpectrumModel> spectrumModel);
     static Ptr<PLC_ValueBase>   fromValueString(PLCValueString value, Ptr<const SpectrumModel> spectrumModel);
-    static Ptr<PLC_Cable>       fromCableFile(QString cableName, Ptr<const SpectrumModel> spectrumModel);
 
     Ptr<PLC_Channel> getChannel(){return channel;}
     PLC_NetdeviceList getNetDevices(){return netDevices;}
