@@ -11,6 +11,8 @@ bin/tmp/
 !bin/app/icons/
 !bin/app/diagrams/
 
+lib/qjson
+
 *.prf
 *.pro.user
 Makefile
