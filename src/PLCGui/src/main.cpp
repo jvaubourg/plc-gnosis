@@ -4,9 +4,6 @@
 #include <QVariantMap>
 
 
-
-//#include <qjson/parser.h>
-
 #include "MainWindow/mainwindow.h"
 
 #include "nodemodel.h"

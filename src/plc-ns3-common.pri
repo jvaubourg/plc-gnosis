@@ -2,8 +2,8 @@
 #Future versions will ditch the Qwt dependency however.
 
 ########MODIFY THESE VARIABLES TO POINT TO THE APPROPRIATE PATHS ON YOUR SYSTEM########
-QWT_LIB_DIR = $$quote(/usr/local/qwt-6.0.1/lib)
-QWT_INC_DIR = $$quote(/usr/local/qwt-6.0.1/include)
+#QWT_LIB_DIR = $$quote(/usr/local/qwt-6.0.1/lib)
+#QWT_INC_DIR = $$quote(/usr/local/qwt-6.0.1/include)
 
 isEmpty( NS3_DIR ){
     error( "ns3 build directory must be specified: i.e.: 'qmake ns-3gui.unix.pro NS3_DIR =/some/path/ns3.15/build")

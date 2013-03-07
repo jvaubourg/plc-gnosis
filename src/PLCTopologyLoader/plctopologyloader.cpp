@@ -1,7 +1,9 @@
 #include "plctopologyloader.h"
 #include <QFile>
 
-#include "qjson/parser.h"
+#include <QtCore/QVariant>
+
+#include "../../lib/qjson/src/parser.h"
 
 #include "ns3/plc-spectrum-helper.h"
 #include "ns3/object-factory.h"

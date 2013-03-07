@@ -36,12 +36,16 @@ SOURCES +=  src/main.cpp \
             src/PLCGraphicsNodeItem/plcgraphicsnodeitem.cpp \
             src/PLCGraphicsEdgeItem/plcgraphicsedgeitem.cpp \
             src/EdgeConfiguration/edgeconfiguration.cpp \
-            src/PLCSpectrumConfiguration/plcspectrumconfiguration.cpp
+            src/PLCSpectrumConfiguration/plcspectrumconfiguration.cpp\
+
+
 
 
 #Setup destination for binaries and temp files
 DESTDIR =      $$BIN_DIRECTORY/app/
 
+
+QMAKE_EXT_OBJ = .myobj
 #Configuration specific settings
 CONFIG(debug, release|debug) {
     TARGET = ns-3gui-debug

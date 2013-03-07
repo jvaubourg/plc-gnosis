@@ -31,8 +31,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 #include <QDebug>
 #include <QFileDialog>
 
-#include <qjson/serializer.h>
-#include <qjson/parser.h>
+#include "../../lib/qjson/src/parser.h"
+#include "../../lib/qjson/src/serializer.h"
 
 
 /*! Creates a default diagram sheet with the given QObject parent */

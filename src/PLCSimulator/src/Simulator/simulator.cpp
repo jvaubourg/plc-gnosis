@@ -1,7 +1,7 @@
 #include "simulator.h"
 
 #include <QFile>
-#include "qjson/parser.h"
+#include "../../lib/qjson/src/parser.h"
 
 #include "ns3/plc.h"
 #include "ns3/log.h"
