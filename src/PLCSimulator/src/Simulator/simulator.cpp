@@ -19,6 +19,10 @@
 
 #include "../SimulatorMainWindow/simulatormainwindow.h"
 
+void PLCSimulator::exportTransferData(QString fileName, Ptr<PLC_TransferBase> ctf){
+
+}
+
 QVector<QVector<double> > PLCSimulator::ctfToPlottable(Ptr<PLC_TransferVector> ctf){
     QVector<double> xValues;
     QVector<double> abs;
@@ -136,11 +140,11 @@ void PLCSimulator::showTransferFunctions(){
                 NS_ABORT_MSG_IF(chImpl == NULL, "no channel from rxDev to txDev");
 
                 Ptr<PLC_TransferBase> chTransFunc = chImpl->GetChannelTransferVector();
+
                 NS_ASSERT(chTransFunc->GetValueType() == PLC_ValueBase::FREQ_SELECTIVE);
 
 
                 //Plot the channel transfer functionnew BodeWidget();
-
                 Ptr<PLC_TransferVector> data = StaticCast<PLC_TransferVector, PLC_TransferBase> (chTransFunc);
                 BodeData plotData = ctfToPlottable(data);
 
@@ -166,3 +170,5 @@ void PLCSimulator::showTransferFunctions(){
 
     qDebug() << "Diagram has " << transmitterDevices.size() << "Tx and " << receiverDevices.size() << "receivers";
 }
+
+void

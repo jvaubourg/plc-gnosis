@@ -16,6 +16,8 @@ public:
     PLCSimulator();
     PLCSimulator(QString modelFileName);
     void showTransferFunctions();
+    void exportTransferData(QString fileName);
+
     //void showTransferFunction(QString from, QString to);
 
     static QVector<QVector<double> > ctfToPlottable(Ptr<PLC_TransferVector> ctf);

@@ -26,7 +26,7 @@ The first and most obvious prerequisite is downloading the source code. If you'r
 
 The GUI has been designed using the Qt GUI Framework and SHOULD work with the all 4.8 series of releases. We have TESTED mostly with 4.8.3, so please let us know if you run into any problems with your specific version. We will port to Qt 5 when it becomes a little more widespread.
 
-Please see 
+Please see the main Qt page for downloads/installation instructions for your platform [here](http://qt-project.org "Qt Project Main Site")
 
 ###*[QJson](https://github.com/flavio/qjson "GitHub page for QJson")*
 
@@ -35,4 +35,4 @@ The QJson library provides us with an elegant way of interfacing our Qt based GU
 	cd plc-gnosis/lib  
 	git clone git://github.com/flavio/qjson.git qjson
 
-You are done with this prerequisite once the cloning completes.
+You are done with this prerequisite once the cloning process completes.
