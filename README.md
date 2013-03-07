@@ -17,7 +17,7 @@ Building software successfully should never be a headache... even though it ofte
 
 ###Prerequisites
 
-The first and most obvious prerequisite is downloading the source code. If you're reading this document then you have probably already found it. If not however, please wander over to our [GitHub](http://github.com) page [here](http://github.com/Valiance/plc-gnosis "PLC-Gnosis Main Git Repository).
+The first and most obvious prerequisite is downloading the source code. If you're reading this document then you have probably already found it. If not however, please wander over to our [GitHub](http://github.com) page [here](http://github.com/Valiance/plc-gnosis "PLC-Gnosis Main Git Repository").
 
 ###*[QJson](https://github.com/flavio/qjson "GitHub page for QJson")*
 
