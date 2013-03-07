@@ -32,7 +32,7 @@ Please see
 
 The QJson library provides us with an elegant way of interfacing our Qt based GUI with our JSON based format for diagram files. Shared libraries are often a massive pain and since we would like to keep our instructions as platform-agnostic as possible, we compile QJson directly and link statically. Satisfying this prerequisite involves making a clone of the QJson repository into the lib directory of our source tree as follows:
 
-> cd plc-gnosis/lib
-> git clone git://github.com/flavio/qjson.git qjson
+	cd plc-gnosis/lib
+	git clone git://github.com/flavio/qjson.git qjson
 
 You are done with this prerequisite once the cloning completes.
