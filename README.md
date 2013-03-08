@@ -10,6 +10,10 @@ The purpose of this software is to abstract away the difficult and time-consumin
 
 The GUI provides most of the tools necessary to graphically represent the available network components and provides an intuitive interface for adjusting model parameters, cable types, noise sources and others. Also built by this package is a library through which models created in the GUI can be loaded into hand-crafted simulation code. This allows for extreme flexibility in both method and purpose when using the ns-3 plc module to model power line communication networks.
 
+##License Stuff
+
+As much of the code as possible has been verified to be compatible with GPLv3. While we have done our best to ensure that there are no licensing conflicts, there remains the possibility that we have overlooked something. If something suspicious catches your eye, please let us know so that we can rectify the situation.
+
 ##Build Instructions
 
 A lot of work has been put into making sure that this code is easy to build and use. Should anyone have any problems please post in the issue tracker and we will attempt to fix it as soon as possible. 
@@ -19,8 +23,27 @@ Building software successfully should never be a headache... even though it ofte
 If you want to skip to less verbose instructions, please see the tl;dr version below.
 
 ###Prerequisites
-
 The first and most obvious prerequisite is downloading the source code. If you're reading this document then you have probably already found it. If not however, please wander over to our [GitHub](http://github.com) page [here](http://github.com/Valiance/plc-gnosis "PLC-Gnosis Main Git Repository"). Clone the repository into a directory of your choosing.
+
+###NS-3 Simulator Software w/ the PLC Module
+This prereq is probably going to be the most time consuming to satisfy. It involves getting the ns-3 simulator software from [here](http://www.nsnam.org/), downloading our plc module into the src directory, and then building everything. As of writing the current release is ns-3.16, however we have only been testing with 3.14 and 3.15. If you feel adventurous you should have no problem using the latest version but we cannot guarantee (as if we could guarantee anything at all anyway) that it will work or compile or build as expected. You can find previous releases, including the versions we have tested with [here](http://www.nsnam.org/releases/older/).
+
+>**The plc module does not check for the presence of the boost libraries even though they are required. We need to make sure it does.**
+
+>*It is also required that the user build the plc module, however we have not had the chance to get this into a repository yet. I will include basic instructions here (like making sure the boost library is available and where to put the plc module source code inside the ns-3 directory) but the plc module will have a similar front page on it's own git repository explaining in as much detail as possible how to build the software.
+
+Once built the ns-3 software will essentially be a collection of shared library files sitting in a directory similar to this:
+
+	ns-allinone-3.15/ns-3.15/build
+
+**You will need this location in order to build the software**, since we do two things:
+
+1. We link some code against these dynamic libraries so that both the simulator and loader can call it.
+2. We use the directory as a default setting for setting the LD\_LIBRARY\_PATH environment variable when starting up the simulator from the GUI. 
+
+**Note the directory of your build folder and keep it for use later in the build process.**
+
+>Whether or not this is an ideal solution to dealing with necessary external libraries is still in question. We'd rather not require that users notify ldconfig or other equivalents of the existence of the ns-3 libraries since that's not really how the ns-3 software seems to do things (scripts and whatnot are run through the waf build system and everything seems to stay in the local directory structure). Again, as with anything to do with this software if you feel you have a better solution please let us know. 
 
 ###Qt
 
