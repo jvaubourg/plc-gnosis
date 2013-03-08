@@ -9,7 +9,7 @@ class SimulatorMainWindow : public QMainWindow
     Q_OBJECT
 public:
     explicit SimulatorMainWindow(QWidget *parent = 0);
-    BodeWidget * plot;
+    BodeWidget * getPlot(){ return plot; }
 
 signals:
     
@@ -17,6 +17,8 @@ public slots:
     void saveMagnitudePlotAsPDF();
 
 private:
+    BodeWidget * plot;
+
 
     
 };

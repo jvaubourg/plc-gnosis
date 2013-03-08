@@ -10,12 +10,17 @@
 #include <ns3/plc-node.h>
 #include <ns3/plc.h>
 
+#include "../BodeWidget/bodewidget.h"
+#include "../SimulatorMainWindow/simulatormainwindow.h"
+
 class PLCSimulator
 {
 public:
     PLCSimulator();
     PLCSimulator(QString modelFileName);
-    void showTransferFunctions();
+    void collectTransferFunctions();
+    void showMainWindow();
+    int numberOfPlots();
 
     static void exportTransferData(QString fileName, Ptr<PLC_TransferBase> ctf);
 
@@ -23,7 +28,10 @@ public:
 
     static QVector<QVector<double> > ctfToPlottable(Ptr<PLC_TransferVector> ctf);
 private:
+    void setupWidgets();
+
     PLCTopologyLoader * loader;
+    SimulatorMainWindow* mainWindow;
 };
 
 #endif // PLC_GUIHELPER_H

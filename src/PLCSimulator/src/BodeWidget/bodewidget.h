@@ -18,6 +18,8 @@ public:
     QCustomPlot* getDBPlot(){ return dbPlot; }
     QCustomPlot* getPAPlot(){ return paPlot; }
 
+    unsigned int getNumberPlots(){ return paGraphMap.count(); }
+
 signals:
     
 public slots:

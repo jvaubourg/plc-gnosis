@@ -7,8 +7,17 @@ int main(int argc, char* argv[]){
 
     PLCSimulator simulator;
     //PLCSimulator simulator("./diagrams/ScenarioB.dgm");
-    simulator.showTransferFunctions();
+    simulator.collectTransferFunctions();
 
-    app.exec();
+    if(simulator.numberOfPlots() > 0){
+        simulator.showMainWindow();
+        app.exec();
+    }
+    else {
+        qDebug() << "No plottable transfer functions. See the /data/ directory for exported files";
+    }
+
+    qDebug() << "Simulator process finished";
+
     return 0;
 }

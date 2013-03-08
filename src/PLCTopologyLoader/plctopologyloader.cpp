@@ -140,6 +140,9 @@ Ptr<PLC_ValueBase> PLCTopologyLoader::valueFromFile(const QString& file, Ptr<con
     int rows = lines.length();
     int cols = lines.at(0).split(',').length();
 
+    qDebug() << "Loading file: " << file;
+    qDebug() << "  Dimensions: " << '(' << (rows/2) << "Time Slots," << cols << "Freq. Slots)";
+
     QList<QList<double> > data;
     QList<double> currentRow;
 

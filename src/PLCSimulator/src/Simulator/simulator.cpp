@@ -16,9 +16,8 @@
 #include <QDebug>
 
 #include "../../lib/QCustomPlot/qcustomplot.h"
-#include "../BodeWidget/bodewidget.h"
 
-#include "../SimulatorMainWindow/simulatormainwindow.h"
+
 
 void PLCSimulator::exportTransferData(QString fileName, Ptr<PLC_TransferBase> ctf){
     QFile file("./data/" + fileName + ".dat");
@@ -37,13 +36,13 @@ void PLCSimulator::exportTransferData(QString fileName, Ptr<PLC_TransferBase> ct
         timeLoops = timeVariantCtf->GetNumTimeSlots();
         freqLoops = timeVariantCtf->GetNumBands();
 
-        qDebug() << "Outter Dims: " << timeVariantCtf->GetValuesRef()->size();
-        qDebug() << " Inner Dims: " << timeVariantCtf->GetValuesRef()->at(0).size();
+        //qDebug() << "Outter Dims: " << timeVariantCtf->GetValuesRef()->size();
+        //qDebug() << " Inner Dims: " << timeVariantCtf->GetValuesRef()->at(0).size();
     }
     else {
         freqVariantCtf = StaticCast<PLC_TransferVector, PLC_TransferBase>(ctf);
         freqLoops = freqVariantCtf->GetNumBands();
-        qDebug() << "Freq Dims: " << freqVariantCtf->GetValuesRef()->size();
+        //qDebug() << "Freq Dims: " << freqVariantCtf->GetValuesRef()->size();
     }
 
     QTextStream stream(&file);
@@ -140,6 +139,7 @@ PLCSimulator::PLCSimulator(){
     PLCTopologyModel* topologyModel = new PLCTopologyModel(modelData);
     this->loader = new PLCTopologyLoader(*topologyModel);
 
+    setupWidgets();
 }
 
 PLCSimulator::PLCSimulator(QString modelFileName){
@@ -152,9 +152,29 @@ PLCSimulator::PLCSimulator(QString modelFileName){
     QVariantMap modelData = parser.parse(jsonData).toMap();
     PLCTopologyModel* topologyModel = new PLCTopologyModel(modelData);
     this->loader = new PLCTopologyLoader(*topologyModel);
+
+    setupWidgets();
 }
 
-void PLCSimulator::showTransferFunctions(){
+void PLCSimulator::setupWidgets(){
+    mainWindow = new SimulatorMainWindow();
+
+    mainWindow->setWindowTitle("Channel Transfer Functions");
+    mainWindow->resize(600, 400);
+
+
+}
+
+void PLCSimulator::showMainWindow(){
+    mainWindow->getPlot()->replot();
+    mainWindow->show();
+}
+
+int PLCSimulator::numberOfPlots(){
+    return mainWindow->getPlot()->getNumberPlots();
+}
+
+void PLCSimulator::collectTransferFunctions(){
     //LogComponentEnable("PLC_Channel", LOG_LEVEL_FUNCTION);
     //LogComponentEnable("PLC_Edge", LOG_LEVEL_FUNCTION);
     //LogComponentEnable("PLC_Node", LOG_LEVEL_FUNCTION);
@@ -180,8 +200,7 @@ void PLCSimulator::showTransferFunctions(){
     Ptr<PLC_TxInterface> txIf;
     Ptr<PLC_RxInterface> rxIf;
 
-    SimulatorMainWindow* mainWindow = new SimulatorMainWindow();
-    BodeWidget * bodeWidget = mainWindow->plot;
+    BodeWidget * const bodePlot = mainWindow->getPlot();
 
     for(unsigned int i = 0; i < transmitterDevices.size(); i++){
 
@@ -213,18 +232,14 @@ void PLCSimulator::showTransferFunctions(){
                     BodeData plotData = ctfToPlottable(data);
 
                     qDebug() << "Adding: " << name << "to Bode Widget";
-                    bodeWidget->addBodePlot(&plotData, name);
+                    bodePlot->addBodePlot(&plotData, name);
                 }
             }
         }
     }
 
-
-    mainWindow->setWindowTitle("Channel Transfer Functions");
-    mainWindow->resize(600, 400);
-    bodeWidget->replot();
-    mainWindow->show();
+    qDebug() << "Diagram has" << transmitterDevices.size() << "Tx device(s) and" << receiverDevices.size() << "Rx device(s)";
+    qDebug() << "Finished collecting all channel transfer functions!";
 
 
-    qDebug() << "Diagram has " << transmitterDevices.size() << "Tx and " << receiverDevices.size() << "receivers";
 }
