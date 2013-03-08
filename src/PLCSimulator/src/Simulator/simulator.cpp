@@ -11,6 +11,7 @@
 
 #include <QApplication>
 #include <QSharedMemory>
+#include <QTextStream>
 
 #include <QDebug>
 
@@ -20,7 +21,64 @@
 #include "../SimulatorMainWindow/simulatormainwindow.h"
 
 void PLCSimulator::exportTransferData(QString fileName, Ptr<PLC_TransferBase> ctf){
+    QFile file("./data/" + fileName + ".dat");
+    file.open(QIODevice::Truncate | QIODevice::WriteOnly);
 
+    Ptr<PLC_TimeVariantTransferVector> timeVariantCtf;
+    Ptr<PLC_TransferVector> freqVariantCtf;
+
+    bool ctfIsTimeVariant = ctf->IsTimeVariant();
+
+    unsigned int timeLoops = 1;
+    unsigned int freqLoops = 1;
+
+    if(ctfIsTimeVariant){
+        timeVariantCtf = StaticCast<PLC_TimeVariantTransferVector, PLC_TransferBase>(ctf);
+        timeLoops = timeVariantCtf->GetNumTimeSlots();
+        freqLoops = timeVariantCtf->GetNumBands();
+
+        qDebug() << "Outter Dims: " << timeVariantCtf->GetValuesRef()->size();
+        qDebug() << " Inner Dims: " << timeVariantCtf->GetValuesRef()->at(0).size();
+    }
+    else {
+        freqVariantCtf = StaticCast<PLC_TransferVector, PLC_TransferBase>(ctf);
+        freqLoops = freqVariantCtf->GetNumBands();
+        qDebug() << "Freq Dims: " << freqVariantCtf->GetValuesRef()->size();
+    }
+
+    QTextStream stream(&file);
+    stream.setRealNumberNotation(QTextStream::ScientificNotation);
+    stream.setRealNumberPrecision(10);
+
+    Ptr<const SpectrumModel> sm = ctf->GetSpectrumModel();
+    stream << (*(sm->Begin())).fc << ',';
+    stream << (*(sm->End() - 1)).fc << ',';
+    stream << sm->GetNumBands() << '\n';
+
+    stream << PLC_Time::GetPeriodS() << ',';
+    stream << PLC_Time::GetNumTimeslots() << '\n';
+
+    for(unsigned int i = 0; i < timeLoops; i++){
+        PLC_ValueSpectrum* currentSpectrum = ctfIsTimeVariant ? &timeVariantCtf->GetValuesRef()->at(i):freqVariantCtf->GetValuesRef();
+
+        for(unsigned int j = 0; j < freqLoops - 1; j++){
+            stream << currentSpectrum->at(j).real() << ',';
+        }
+        stream << currentSpectrum->at(freqLoops - 1).real() << '\n';
+    }
+
+    for(unsigned int i = 0; i < timeLoops; i++){
+        PLC_ValueSpectrum* currentSpectrum = ctfIsTimeVariant ? &timeVariantCtf->GetValuesRef()->at(i):freqVariantCtf->GetValuesRef();
+
+        for(unsigned int j = 0; j < freqLoops - 1; j++){
+            stream << currentSpectrum->at(j).imag() << ',';
+        }
+
+        stream << currentSpectrum->at(freqLoops - 1).imag() << '\n';
+    }
+
+    stream.flush();
+    file.close();
 }
 
 QVector<QVector<double> > PLCSimulator::ctfToPlottable(Ptr<PLC_TransferVector> ctf){
@@ -58,7 +116,6 @@ QVector<QVector<double> > PLCSimulator::ctfToPlottable(Ptr<PLC_TransferVector> c
             xValues.remove(i);
         }
     }
-
 
     ret.push_back(xValues);
     ret.push_back(abs);
@@ -141,24 +198,25 @@ void PLCSimulator::showTransferFunctions(){
 
                 Ptr<PLC_TransferBase> chTransFunc = chImpl->GetChannelTransferVector();
 
+                QString name;
+                name += transmitterNames.at(i) + "-to-" + receiverNames.at(j);
+
                 NS_ASSERT(chTransFunc->GetValueType() == PLC_ValueBase::FREQ_SELECTIVE);
 
+                if(chTransFunc->IsTimeVariant()){
+                    qDebug() << "Cannot plot time variant functions. Exporting to" << (name + ".dat");
+                    exportTransferData(name, chTransFunc);
+                }
+                else{
+                    //Plot the channel transfer functionnew BodeWidget();
+                    Ptr<PLC_TransferVector> data = StaticCast<PLC_TransferVector, PLC_TransferBase> (chTransFunc);
+                    BodeData plotData = ctfToPlottable(data);
 
-                //Plot the channel transfer functionnew BodeWidget();
-                Ptr<PLC_TransferVector> data = StaticCast<PLC_TransferVector, PLC_TransferBase> (chTransFunc);
-                BodeData plotData = ctfToPlottable(data);
-
-                QString name;
-
-                name += transmitterNames.at(i);
-                name += " to ";
-                name += receiverNames.at(j);
-
-                qDebug() << "Adding: " << name << "to Bode Widget";
-                bodeWidget->addBodePlot(&plotData, name);
+                    qDebug() << "Adding: " << name << "to Bode Widget";
+                    bodeWidget->addBodePlot(&plotData, name);
+                }
             }
         }
-
     }
 
 
@@ -170,5 +228,3 @@ void PLCSimulator::showTransferFunctions(){
 
     qDebug() << "Diagram has " << transmitterDevices.size() << "Tx and " << receiverDevices.size() << "receivers";
 }
-
-void

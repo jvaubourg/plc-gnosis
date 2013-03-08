@@ -16,7 +16,8 @@ public:
     PLCSimulator();
     PLCSimulator(QString modelFileName);
     void showTransferFunctions();
-    void exportTransferData(QString fileName);
+
+    static void exportTransferData(QString fileName, Ptr<PLC_TransferBase> ctf);
 
     //void showTransferFunction(QString from, QString to);
 
