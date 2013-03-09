@@ -28,7 +28,7 @@ The first and most obvious prerequisite is downloading the source code. If you'r
 ###NS-3 Simulator Software w/ the PLC Module
 This prereq is probably going to be the most time consuming to satisfy. It involves getting the ns-3 simulator software from [here](http://www.nsnam.org/), downloading our plc module into the src directory, and then building everything. As of writing the current release is ns-3.16, however we have only been testing with 3.14 and 3.15. If you feel adventurous you should have no problem using the latest version but we cannot guarantee (as if we could guarantee anything at all anyway) that it will work or compile or build as expected. You can find previous releases, including the versions we have tested with [here](http://www.nsnam.org/releases/older/).
 
->**The plc module does not check for the presence of the boost libraries even though they are required. We need to make sure it does.**
+**The plc module does not check for the presence of the boost libraries even though they are required. We need to make sure it does.**
 
 >*It is also required that the user build the plc module, however we have not had the chance to get this into a repository yet. I will include basic instructions here (like making sure the boost library is available and where to put the plc module source code inside the ns-3 directory) but the plc module will have a similar front page on it's own git repository explaining in as much detail as possible how to build the software.
 
