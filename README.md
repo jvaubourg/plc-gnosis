@@ -25,7 +25,17 @@ If you want to skip to less verbose instructions, please see the tl;dr version b
 ###Prerequisites
 The first and most obvious prerequisite is downloading the source code. If you're reading this document then you have probably already found it. If not however, please wander over to our [GitHub](http://github.com) page [here](http://github.com/Valiance/plc-gnosis "PLC-Gnosis Main Git Repository"). Clone the repository into a directory of your choosing.
 
+Running
+
+	git clone git://github.com/Valiance/plc-gnosis.git
+
+Will obtain the latest version of the software
+
+
+Git is obviously required and can be downloaded from it's [website](http://git-scm.com/)
+
 ###NS-3 Simulator Software w/ the PLC Module
+
 This prereq is probably going to be the most time consuming to satisfy. It involves getting the ns-3 simulator software from [here](http://www.nsnam.org/), downloading our plc module into the src directory, and then building everything. As of writing the current release is ns-3.16, however we have only been testing with 3.14 and 3.15. If you feel adventurous you should have no problem using the latest version but we cannot guarantee (as if we could guarantee anything at all anyway) that it will work or compile or build as expected. You can find previous releases, including the versions we have tested with [here](http://www.nsnam.org/releases/older/).
 
 **The plc module does not check for the presence of the boost libraries even though they are required. We need to make sure it does.**
@@ -34,7 +44,7 @@ This prereq is probably going to be the most time consuming to satisfy. It invol
 
 Once built the ns-3 software will essentially be a collection of shared library files sitting in a directory similar to this:
 
-	ns-allinone-3.15/ns-3.15/build
+	/home/user/Desktop/ns-allinone-3.15/ns-3.15/build
 
 **You will need this location in order to build the software**, since we do two things:
 
@@ -51,6 +61,12 @@ The GUI has been designed using the Qt GUI Framework and SHOULD work with the al
 
 Please see the main Qt page for downloads/installation instructions for your platform [here](http://qt-project.org "Qt Project Main Site")
 
+If you're system has Qt installed properly you should be able to execute
+	
+	qmake -v
+
+And get a reasonable output.
+
 ###*[QJson](https://github.com/flavio/qjson "GitHub page for QJson")*
 
 The QJson library provides us with an elegant way of interfacing our Qt based GUI with our JSON based format for diagram files. Shared libraries are often a massive pain and since we would like to keep our instructions as platform-agnostic as possible, we compile QJson directly and link statically. Satisfying this prerequisite involves making a clone of the QJson repository into the lib directory of our source tree as follows:
@@ -59,3 +75,17 @@ The QJson library provides us with an elegant way of interfacing our Qt based GU
 	git clone git://github.com/flavio/qjson.git qjson
 
 You are done with this prerequisite once the cloning process completes.
+
+##GUI Compilation
+
+In order to build the software after all of the prerequisites have been satisfied, you simply need to navigate to the plc-gnosis directory, and execute the following, modifying the path to your ns-3 build directory that was noted earlier:
+
+	qmake ns-3gui.unix.pro CONFIG+=debug NS3_DIR=/your-path-to-ns3/ns-allinone-3.15/ns-3.15/build
+	make
+
+*Note that while there is windows project file, this hasn't been updated for a while and probably won't work. We will eventually ensure the GUI is usable on windows (although obviously it will not be able to interface with the ns-3 simulator software)*
+
+
+
+
+
