@@ -80,7 +80,7 @@ You are done with this prerequisite once the cloning process completes.
 
 In order to build the software after all of the prerequisites have been satisfied, you simply need to navigate to the plc-gnosis/src directory, and execute the following, modifying the path to your ns-3 build directory that was noted earlier:
 
-	qmake ns-3gui.unix.pro NS3_DIR=/your-path-to-ns3/ns-allinone-3.15/ns-3.15/build
+	qmake ns-3gui.unix.pro NS3_DIR=/your-path-to-ns3/ns-allinone-3.15/ns-3.15/build -r
 	make
 
 The software should compile and you will find the executables in the bin/app directory.
@@ -95,7 +95,7 @@ The following code snippet is a summary of the necessary steps to build the gui
 	cd plc-gnosis/lib  
 	git clone git://github.com/flavio/qjson.git qjson  
 	cd ../src  
-	qmake ns-3gui.unix.pro NS3_DIR=/your-path-to-ns3/ns-allinone-3.15/ns-3.15/build  
+	qmake ns-3gui.unix.pro NS3_DIR=/your-path-to-ns3/ns-allinone-3.15/ns-3.15/build -r  
 	make  
 
 
