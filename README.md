@@ -78,10 +78,12 @@ You are done with this prerequisite once the cloning process completes.
 
 ##GUI Compilation
 
-In order to build the software after all of the prerequisites have been satisfied, you simply need to navigate to the plc-gnosis directory, and execute the following, modifying the path to your ns-3 build directory that was noted earlier:
+In order to build the software after all of the prerequisites have been satisfied, you simply need to navigate to the plc-gnosis/src directory, and execute the following, modifying the path to your ns-3 build directory that was noted earlier:
 
-	qmake ns-3gui.unix.pro CONFIG+=debug NS3_DIR=/your-path-to-ns3/ns-allinone-3.15/ns-3.15/build
+	qmake ns-3gui.unix.pro NS3_DIR=/your-path-to-ns3/ns-allinone-3.15/ns-3.15/build
 	make
+
+The software should compile and you will find the executables in the bin/app directory.
 
 *Note that while there is windows project file, this hasn't been updated for a while and probably won't work. We will eventually ensure the GUI is usable on windows (although obviously it will not be able to interface with the ns-3 simulator software)*
 
