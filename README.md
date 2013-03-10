@@ -87,6 +87,18 @@ The software should compile and you will find the executables in the bin/app dir
 
 *Note that while there is windows project file, this hasn't been updated for a while and probably won't work. We will eventually ensure the GUI is usable on windows (although obviously it will not be able to interface with the ns-3 simulator software)*
 
+##TL;DR
+
+The following code snippet is a summary of the necessary steps to build the gui
+
+	git clone git://github.com/Valiance/plc-gnosis.git plc-gnosis  
+	cd plc-gnosis/lib  
+	git clone git://github.com/flavio/qjson.git qjson  
+	cd ../src  
+	qmake ns-3gui.unix.pro NS3_DIR=/your-path-to-ns3/ns-allinone-3.15/ns-3.15/build  
+	make  
+
+
 
 
 
