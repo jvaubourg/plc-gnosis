@@ -237,7 +237,7 @@ void MainWindow::runSimulation(){
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 
     //Make sure we can get at the ns3 libraries
-    env.insert("LD_LIBRARY_PATH", QDir::currentPath() + ':' + this->ns3BuildPath + ':' + env.value("LD_LIBRARY_PATH"));
+    env.insert(LD_ENV_VAR, QDir::currentPath() + ':' + this->ns3BuildPath + ':' + env.value(LD_ENV_VAR));
     simulatorProcess->setProcessEnvironment(env);
 
     connect(simulatorProcess, SIGNAL(readyRead()), this, SLOT(readFromSimulation()));

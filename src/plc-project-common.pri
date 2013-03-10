@@ -9,6 +9,10 @@ windows:{
     DEFINES += QJSON_MAKEDLL
 }
 
+macx: {
+
+}
+
 HEADERS +=  $$QJSON_SRC_DIR/json_parser.hh \
             $$QJSON_SRC_DIR/json_scanner.h \
             $$QJSON_SRC_DIR/location.hh \
