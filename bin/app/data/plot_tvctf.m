@@ -4,3 +4,5 @@ function [] = plot_tvctf(fileName)
 figure;
 imagesc(freqAxis, timeAxis, abs(data));
 colorbar;
+xlabel('Frequency (Hz)');
+ylabel('Time (s)');
