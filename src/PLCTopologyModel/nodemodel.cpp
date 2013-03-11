@@ -3,19 +3,27 @@
 NodeModel::NodeModel()
 {
     hasOutlet = false;
+
+    netDevice = 0;
+    noiseSource = 0;
 }
 
 NodeModel::NodeModel(const QVariantMap &map){
+    hasOutlet = false;
+
+    netDevice = 0;
+    noiseSource = 0;
+
     fromVariantMap(map);
 }
 
 NodeModel::~NodeModel(){
-    for(int i = 0; i < associatedNetDevices.length(); i++){
-        delete(associatedNetDevices.at(i));
+    if(netDevice != 0){
+        delete netDevice;
     }
 
-    for(int i = 0; i < associatedNoiseSources.length(); i++){
-        delete(associatedNoiseSources.at(i));
+    if(noiseSource != 0){
+        delete noiseSource;
     }
 }
 
@@ -26,21 +34,21 @@ QVariantMap NodeModel::toVariantMap(){
     QVariantList netDevices;
     QVariantList noiseSources;
 
-    for(int i = 0; i < associatedNetDevices.length(); i++){
-        netDevices << associatedNetDevices.at(i)->toVariantMap();
-    }
-
-    for(int i = 0; i < associatedNoiseSources.length(); i++){
-        noiseSources << associatedNoiseSources.at(i)->toVariantMap();
-    }
 
     pos << this->position.x() << this->position.y();
 
     map["Name"] = this->name;
     map["HasOutlet"] = this->hasOutlet;
     map["Position"] = pos;
-    map["NetDevices"] = netDevices;
-    map["NoiseSources"] = noiseSources;
+
+    if(netDevice != 0){
+        map["NetDevice"] = netDevice->toVariantMap();
+    }
+
+    if(noiseSource != 0){
+        map["NoiseSources"] = noiseSource->toVariantMap();
+    }
+
     map["OutletImpedance"] = outletImpedance.getValue();
 
     return map;
@@ -49,18 +57,18 @@ QVariantMap NodeModel::toVariantMap(){
 void NodeModel::fromVariantMap(const QVariantMap& map){
 
     QVariantList pos = map["Position"].toList();
-    QVariantList netDevices = map["NetDevices"].toList();
-    QVariantList noiseSources = map["NoiseSources"].toList();
+    QVariantMap netDeviceMap = map["NetDevice"].toMap();
+    QVariantMap noiseSourceMap = map["NoiseSource"].toMap();
 
     name = map["Name"].toString();
     position = QPointF(pos.at(0).toDouble(), pos.at(1).toDouble());
 
-    for(int i = 0; i < netDevices.length(); i++){
-        this->associatedNetDevices.append(new NetDeviceModel(netDevices.at(i).toMap()));
+    if (!netDeviceMap.isEmpty()){
+        netDevice = new NetDeviceModel(netDeviceMap);
     }
 
-    for(int i = 0; i < noiseSources.length(); i++){
-        this->associatedNoiseSources.append(new NoiseSourceModel(noiseSources.at(i).toMap()));
+    if(!noiseSourceMap.isEmpty()){
+        noiseSource = new NoiseSourceModel(noiseSourceMap);
     }
 
     this->hasOutlet = map["HasOutlet"].toBool();

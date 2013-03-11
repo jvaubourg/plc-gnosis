@@ -1,11 +1,14 @@
-#include "netdevicedialog.h"
+#include "netdeviceeditor.h"
 #include <QHBoxLayout>
 
-NetDeviceDialog::NetDeviceDialog(NetDeviceModel* device, QListWidgetItem* item, QWidget *parent) :
-    QDialog(parent)
+NetDeviceEditor::NetDeviceEditor(NetDeviceModel* device, QWidget *parent) :
+    QWidget(parent)
 {
     netDevModel = device;
-    listItem = item;
+
+    if(netDevModel == 0){
+        netDevModel = new NetDeviceModel();
+    }
 
     QLabel * nameLabel = new QLabel("Name:", this);
     nameLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -24,33 +27,20 @@ NetDeviceDialog::NetDeviceDialog(NetDeviceModel* device, QListWidgetItem* item, 
     txImpedanceInput->setCheckable(true);
     rxImpedanceInput->setCheckable(true);
 
-    QVBoxLayout * dialogLayout = new QVBoxLayout();
-    dialogLayout->addLayout(nameLayout);
+    QVBoxLayout * editorLayout = new QVBoxLayout();
+    editorLayout->addLayout(nameLayout);
 
-    dialogLayout->addWidget(shuntImpedanceInput);
-    dialogLayout->addWidget(txImpedanceInput);
-    dialogLayout->addWidget(rxImpedanceInput);
+    editorLayout->addWidget(shuntImpedanceInput);
+    editorLayout->addWidget(txImpedanceInput);
+    editorLayout->addWidget(rxImpedanceInput);
 
 
-    this->setLayout(dialogLayout);
-
-    QHBoxLayout * buttonLayout = new QHBoxLayout();
-    QPushButton * acceptButton = new QPushButton("Accept", this);
-    QPushButton * deleteButton = new QPushButton("Remove");
-    //deleteButton->setFixedWidth(20);
-
-    buttonLayout->addWidget(acceptButton);
-    buttonLayout->addWidget(deleteButton);
-
-    connect(acceptButton, SIGNAL(clicked()), this, SLOT(acceptClicked()));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-
-    dialogLayout->addLayout(buttonLayout);
+    this->setLayout(editorLayout);
 
     populateFromModel();
 }
 
-void NetDeviceDialog::populateFromModel(){
+void NetDeviceEditor::populateFromModel(){
     this->nameEdit->setText(netDevModel->getName());
     this->shuntImpedanceInput->setValue(netDevModel->getShuntImpedance().getValue());
 
@@ -65,12 +55,10 @@ void NetDeviceDialog::populateFromModel(){
     this->txImpedanceInput->setChecked(netDevModel->transmitterEnabled());
 }
 
-void NetDeviceDialog::acceptClicked(){
+void NetDeviceEditor::saveChanges(){
 
     if(nameEdit->text().length() != 0 && txImpedanceInput->isValid() && rxImpedanceInput->isValid()
             && shuntImpedanceInput->isValid()){
-
-        listItem->setText(nameEdit->text());
 
         this->netDevModel->setName(nameEdit->text());
         this->netDevModel->setTXImpedance(txImpedanceInput->getValue());
@@ -85,15 +73,5 @@ void NetDeviceDialog::acceptClicked(){
 
         this->netDevModel->setReceiverEnabled(rxImpedanceInput->isChecked());
         this->netDevModel->setTransmitterEnabled(txImpedanceInput->isChecked());
-
-        accept();
     }
-}
-
-void NetDeviceDialog::deleteClicked(){
-    done(-1);
-}
-
-void NetDeviceDialog::closeEvent(QCloseEvent *event){
-    event->ignore();
 }

@@ -3,7 +3,7 @@
 
 #include <QListWidget>
 #include <QPushButton>
-#include "netdevicedialog.h"
+#include "netdeviceeditor.h"
 #include "noisesourcedialog.h"
 #include "plcvaluestring.h"
 #include "netdevicemodel.h"
@@ -28,23 +28,29 @@ NodeConfiguration::NodeConfiguration(NodeModel *node, QDialog *parent) :
     outletSettingsLayout->addWidget(outletImpedanceInput);
     outletSettings->setLayout(outletSettingsLayout);
 
-    QGroupBox* netDevicesGroupBox = new QGroupBox("Net Devices");
-    QVBoxLayout* netDevicesSettingsLayout = new QVBoxLayout();
+    QGroupBox* netDeviceGroupBox = new QGroupBox("Net Device");
+    netDeviceGroupBox->setCheckable(true);
+
+    QWidget* netDeviceEditor = new NetDeviceEditor(node->getNetDevice());
     netDevicesView = new QListWidget();
 
-    netDevicesSettingsLayout->addWidget(netDevicesView);
-    netDevicesGroupBox->setLayout(netDevicesSettingsLayout);
+    QVBoxLayout* netDevConfigLayout = new QVBoxLayout();
+    netDevConfigLayout->addWidget(netDeviceEditor);
 
-    QGroupBox* noiseSourcesGroupBox = new QGroupBox("Noise Sources");
-    QVBoxLayout* noiseSourcesSettingsLayout = new QVBoxLayout();
-    noiseSourcesView = new QListWidget();
+    netDeviceGroupBox->setLayout(netDevConfigLayout);
+
+    QGroupBox* noiseSourceGroupBox = new QGroupBox("Noise Source");
+    noiseSourceGroupBox->setCheckable(true);
+
+    QVBoxLayout* noiseSrcConfigLayout = new QVBoxLayout();
+    QWidget noiseSourceEditor = new NoiseSourceEditor(nose->getNoiseSource());
 
     noiseSourcesSettingsLayout->addWidget(noiseSourcesView);
     noiseSourcesGroupBox->setLayout(noiseSourcesSettingsLayout);
 
     QVBoxLayout * groupBoxesLayout = new QVBoxLayout();
     groupBoxesLayout->addWidget(outletSettings);
-    groupBoxesLayout->addWidget(netDevicesGroupBox);
+    groupBoxesLayout->addWidget(netDeviceGroupBox);
     groupBoxesLayout->addWidget(noiseSourcesGroupBox);
 
     QHBoxLayout * buttonsLayout = new QHBoxLayout();
@@ -72,14 +78,6 @@ void NodeConfiguration::populateFromModel(){
 
     outletSettings->setChecked(nodeModel->getHasOutlet());
     outletImpedanceInput->setValue(nodeModel->getOutletImpedance().getValue());
-
-    for(int i = 0; i < nodeModel->netDevices()->length(); i++){
-        netDevicesView->insertItem(i, nodeModel->netDevices()->at(i)->getName());
-    }
-
-    for(int i = 0; i <nodeModel->noiseSources()->length(); i++){
-        noiseSourcesView->insertItem(i, nodeModel->noiseSources()->at(i)->getName());
-    }
 }
 
 void NodeConfiguration::setModel(NodeModel *newModel){
@@ -87,49 +85,7 @@ void NodeConfiguration::setModel(NodeModel *newModel){
     populateFromModel();
 }
 
-void NodeConfiguration::editNetDevices(QListWidgetItem *item){
-    int currentRow = netDevicesView->currentRow();
 
-    if(currentRow == netDevicesView->count() - 1){
-        netDevicesView->insertItem(netDevicesView->count() - 1, "New Device");
-
-        QString newNetDeviceName = nodeModel->getName() + QString(':')
-                + QString("Dev") + QString::number(netDevicesView->count() - 2);
-
-        nodeModel->netDevices()->append(new NetDeviceModel(newNetDeviceName));
-        item = netDevicesView->item(currentRow);
-    }
-
-    QDialog * dialog = new NetDeviceDialog(nodeModel->netDevices()->at(currentRow), item, this);
-    int result = dialog->exec();
-
-    if(result == -1){
-        nodeModel->netDevices()->removeAt(currentRow);
-        delete(netDevicesView->takeItem(currentRow));
-    }
-
-    delete dialog;
-}
-
-void NodeConfiguration::editNoiseSources(QListWidgetItem *item){
-    int currentRow = noiseSourcesView->currentRow();
-
-    if(currentRow == noiseSourcesView->count() - 1){
-       noiseSourcesView->insertItem(noiseSourcesView->count() - 1, "New Source");
-       nodeModel->noiseSources()->append(new NoiseSourceModel());
-       item = noiseSourcesView->item(currentRow);
-    }
-
-    QDialog * dialog = new NoiseSourceDialog(nodeModel->noiseSources()->at(currentRow), item, this);
-    int result = dialog->exec();
-
-    if(result == -1){
-        nodeModel->noiseSources()->removeAt(currentRow);
-        delete(noiseSourcesView->takeItem(currentRow));
-    }
-
-    delete dialog;
-}
 
 void NodeConfiguration::closeEvent(QCloseEvent * event){
     event->ignore();

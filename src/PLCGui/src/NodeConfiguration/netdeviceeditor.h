@@ -20,26 +20,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 #ifndef NETDEVICEDIALOG_H
 #define NETDEVICEDIALOG_H
 
-#include <QDialog>
 #include "netdevicemodel.h"
 #include "plcdatainputwidget.h"
 #include <QListWidgetItem>
 #include <QCloseEvent>
 
-class NetDeviceDialog : public QDialog
+class NetDeviceEditor : public QWidget
 {
     Q_OBJECT
 public:
-    explicit NetDeviceDialog(NetDeviceModel* device, QListWidgetItem* item, QWidget *parent = 0);
+    explicit NetDeviceEditor(NetDeviceModel* device, QWidget *parent = 0);
+    void saveChanges();
 
 signals:
     
 public slots:
-    void acceptClicked();
-    void deleteClicked();
 
 protected:
-    virtual void closeEvent(QCloseEvent * event);
 
 private:
     void populateFromModel();
@@ -51,7 +48,6 @@ private:
     PLCDataInputWidget * rxImpedanceInput;
 
     NetDeviceModel* netDevModel;
-    QListWidgetItem* listItem;
 };
 
 #endif // NETDEVICEDIALOG_H

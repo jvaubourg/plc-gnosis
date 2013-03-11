@@ -42,8 +42,6 @@ protected:
     virtual void closeEvent(QCloseEvent * event);
     
 public slots:
-    void editNetDevices(QListWidgetItem* item);
-    void editNoiseSources(QListWidgetItem* item);
     void saveAndClose();
 
 

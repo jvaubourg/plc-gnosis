@@ -77,7 +77,7 @@ void PLCGraphicsNodeItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
     painter->setRenderHint(QPainter::Antialiasing, true);
 
     //Draw the net device symbol if node has any associated net devices
-    if(!node->netDevices()->isEmpty()){
+    if(node->getNetDevice() != 0){
         painter->setBrush(Qt::white);
         path.moveTo(0, 0.8*NODEITEM_RADIUS);
         path.lineTo(0.8*NODEITEM_RADIUS*cos(M_PI/6.0), -0.8*NODEITEM_RADIUS*sin(M_PI/6.0));
@@ -88,14 +88,14 @@ void PLCGraphicsNodeItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
         painter->strokePath(path, painter->pen());
 
         //Draw circle if has transmitter
-        if(node->netDevices()->at(0)->transmitterEnabled()){
+        if(node->getNetDevice()->transmitterEnabled()){
             painter->setBrush(Qt::transparent);
 
               painter->drawEllipse(QPointF(0, 0), 0.6*NODEITEM_RADIUS, 0.6*NODEITEM_RADIUS);
         }
 
         //Fill in triangle if has receiver
-        if(node->netDevices()->at(0)->receiverEnabled()){
+        if(node->getNetDevice()->receiverEnabled()){
             painter->fillPath(path, QBrush(Qt::black));
             impedanceLabel->setPlainText("");
             //impedanceLabel->setPlainText(node->netDevices()->at(0)->getRXImpedance().getValue() + QString::fromUtf8("\u2126"));
@@ -104,7 +104,7 @@ void PLCGraphicsNodeItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
             impedanceLabel->setPlainText("");
         }
 
-        nodeLabel->setPlainText(node->netDevices()->at(0)->getName());
+        nodeLabel->setPlainText(node->getNetDevice()->getName());
     }
     else {
         //Draw basic node
@@ -119,7 +119,7 @@ void PLCGraphicsNodeItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
         painter->drawEllipse(QPointF(0, 0), 0.32*NODEITEM_RADIUS, 0.32*NODEITEM_RADIUS);
     }
 
-    if(!node->noiseSources()->isEmpty()){
+    if(node->getNoiseSource() != 0){
 
         painter->drawArc(-NODEITEM_RADIUS, -NODEITEM_RADIUS, 2*NODEITEM_RADIUS, 2*NODEITEM_RADIUS, 720, 1440);
         painter->drawArc(-0.8*NODEITEM_RADIUS, -0.8*NODEITEM_RADIUS, 1.6*NODEITEM_RADIUS, 1.6*NODEITEM_RADIUS, 720, 1440);
