@@ -9,8 +9,8 @@ windows:{
     DEFINES += QJSON_MAKEDLL
 }
 
-macx: {
-
+macx:{
+    CONFIG -= app_bundle
 }
 
 HEADERS +=  $$QJSON_SRC_DIR/json_parser.hh \
