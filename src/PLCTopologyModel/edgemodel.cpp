@@ -28,8 +28,20 @@ void EdgeModel::fromVariantMap(const QVariantMap &map){
 
     if(map["EdgeType"].toString() == "Cable"){
         isCable = true;
+
         this->cableType = map["CableType"].toString();
-        this->length = map["Length"].toDouble();
+        if(cableType.isEmpty()){
+            qDebug() << "Empty cable type: Setting default value (PLC_NAYY150SE_Cable)";
+            cableType = "PLC_NAYY150SE_Cable";
+        }
+
+        if(!map.contains("Length")){
+            this->length = 10;
+        }
+        else{
+            this->length = map["Length"].toDouble();
+        }
+
     }
     else{
         isCable = false;
