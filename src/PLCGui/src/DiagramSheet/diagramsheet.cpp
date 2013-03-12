@@ -261,7 +261,16 @@ void DiagramSheet::mousePressEvent(QGraphicsSceneMouseEvent *event){
 
     if(sceneEditMode == LineMode){
         event->accept();
-        PLCGraphicsNodeItem* hoveredItem = qgraphicsitem_cast<PLCGraphicsNodeItem*>(itemAt(event->scenePos()));
+
+        QList<QGraphicsItem*> hoveredItems = items(event->scenePos());
+        PLCGraphicsNodeItem* hoveredItem = 0;
+
+        for(int i = 0; i < hoveredItems.length(); i++){
+            hoveredItem = qgraphicsitem_cast<PLCGraphicsNodeItem*>(hoveredItems.at(i));
+            if(hoveredItem != 0){
+                break;
+            }
+        }
 
         if(hoveredItem != 0){
 
@@ -297,7 +306,15 @@ void DiagramSheet::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
 
     if((sceneEditMode == LineMode) && edge){
 
-        PLCGraphicsNodeItem * hoveredItem = qgraphicsitem_cast<PLCGraphicsNodeItem*>(itemAt(event->scenePos()));
+        QList<QGraphicsItem*> hoveredItems = items(event->scenePos());
+        PLCGraphicsNodeItem* hoveredItem = 0;
+
+        for(int i = 0; i < hoveredItems.length(); i++){
+            hoveredItem = qgraphicsitem_cast<PLCGraphicsNodeItem*>(hoveredItems.at(i));
+            if(hoveredItem != 0){
+                break;
+            }
+        }
 
         if(hoveredItem != 0 && hoveredItem != edge->getFromNode()){
             edge->setToNode(hoveredItem);
