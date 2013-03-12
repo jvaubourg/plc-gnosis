@@ -47,6 +47,10 @@ DiagramEditor::DiagramEditor()
     setScene(new DiagramSheet(this));
 
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+
+    zoomAnchorView = QPoint(0, 0);
+    zoomAnchorScene = QRectF(mapToScene(zoomAnchorView - QPoint(1, 1)),
+                             mapToScene(zoomAnchorView + QPoint(1, 1))).center();
 }
 
 /*! This overloaded setScene member function ensures that the set "scene" is actually a diagram
@@ -100,6 +104,27 @@ void DiagramEditor::keyPressEvent(QKeyEvent *event){
     return;
 }
 
+void DiagramEditor::setZoom(double zoom){
+    qreal postZoomFactor = zoom;
+
+    postZoomFactor = (postZoomFactor < 0.25)?0.25:postZoomFactor;
+    postZoomFactor = (postZoomFactor > 8.0)?8.0:postZoomFactor;
+
+    qreal zoomFactor = postZoomFactor/transform().m11();
+    scale(zoomFactor, zoomFactor);
+
+    QPoint posDelta = zoomAnchorView - mapFromScene(zoomAnchorScene);
+
+    QScrollBar * vBar = verticalScrollBar();
+    QScrollBar * hBar = horizontalScrollBar();
+
+    int hValue = hBar->value() - posDelta.x();
+    int vValue = vBar->value() - posDelta.y();
+
+    hBar->setValue(hValue);
+    vBar->setValue(vValue);
+}
+
 /*! Handles wheel events for zooming purposes. By taking into account the cursor position
  *  and the current scene transformation, we create the effect of anchoring zooms at
  *  the cursors position. This custom behaviour precludes the use of Qt's built-in
@@ -111,23 +136,7 @@ void DiagramEditor::wheelEvent(QWheelEvent *event){
 
     if(event->modifiers() & Qt::ControlModifier){
         qreal postZoomFactor = transform().m11() + (event->delta()/(30.0*24.0));
-
-        postZoomFactor = (postZoomFactor < 0.25)?0.25:postZoomFactor;
-        postZoomFactor = (postZoomFactor > 8.0)?8.0:postZoomFactor;
-
-        qreal zoomFactor = postZoomFactor/transform().m11();
-        scale(zoomFactor, zoomFactor);
-
-        QPoint posDelta = zoomAnchorView - mapFromScene(zoomAnchorScene);
-
-        QScrollBar * vBar = verticalScrollBar();
-        QScrollBar * hBar = horizontalScrollBar();
-
-        int hValue = hBar->value() - posDelta.x();
-        int vValue = vBar->value() - posDelta.y();
-
-        hBar->setValue(hValue);
-        vBar->setValue(vValue);
+        setZoom(postZoomFactor);
     }
 
     else{

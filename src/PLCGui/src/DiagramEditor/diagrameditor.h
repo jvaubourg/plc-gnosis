@@ -45,6 +45,9 @@ public:
 
     void setScene(QGraphicsScene *scene);
 
+public slots:
+    void setZoom(double zoom);
+
 protected:
     void wheelEvent(QWheelEvent *event);
     void keyPressEvent(QKeyEvent *event);
