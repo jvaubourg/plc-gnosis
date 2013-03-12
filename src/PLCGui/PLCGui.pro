@@ -28,12 +28,12 @@ HEADERS +=  src/MainWindow/mainwindow.h \
             src/DiagramEditor/diagrameditor.h \
             src/NodeConfiguration/nodeconfiguration.h \
             src/NodeConfiguration/plcdatainputwidget.h \
-            src/NodeConfiguration/noisesourcedialog.h \
             src/PLCGraphicsNodeItem/plcgraphicsnodeitem.h \
             src/PLCGraphicsEdgeItem/plcgraphicsedgeitem.h \
             src/EdgeConfiguration/edgeconfiguration.h \
             src/PLCSpectrumConfiguration/plcspectrumconfiguration.h \
-    src/NodeConfiguration/netdeviceeditor.h
+    src/NodeConfiguration/netdeviceeditor.h \
+    src/NodeConfiguration/noisesourceeditor.h
 
 SOURCES +=  src/main.cpp \
             src/MainWindow/mainwindow.cpp \

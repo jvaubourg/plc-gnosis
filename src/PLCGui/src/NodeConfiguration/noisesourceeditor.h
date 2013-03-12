@@ -27,32 +27,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 #include <QComboBox>
 #include <QCloseEvent>
 
-class NoiseSourceDialog : public QDialog
+class NoiseSourceDialog : public QWidget
 {
     Q_OBJECT
 public:
-    explicit NoiseSourceDialog(NoiseSourceModel* source, QListWidgetItem* item, QWidget *parent);
+    explicit NoiseSourceEditor(NoiseSourceModel* source, QWidget *parent);
     void populateFromModel();
 
 signals:
 
 protected:
-    virtual void closeEvent(QCloseEvent *event);
     
 public slots:
-    void acceptClicked();
-    void deleteClicked();
 
 private:
     QComboBox* noiseTypeSelector;
     QLineEdit* nameEdit;
     PLCDataInputWidget * noisePSDInput;
 
-    QListWidgetItem* listItem;
-
     NoiseSourceModel * noiseSrcModel;
-
-    //TODO Investigate using a QVariantList for other parameters
 };
 
 #endif // NOISESOURCEDIALOG_H

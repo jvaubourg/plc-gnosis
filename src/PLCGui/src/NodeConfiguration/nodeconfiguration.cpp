@@ -45,13 +45,13 @@ NodeConfiguration::NodeConfiguration(NodeModel *node, QDialog *parent) :
     QVBoxLayout* noiseSrcConfigLayout = new QVBoxLayout();
     QWidget noiseSourceEditor = new NoiseSourceEditor(nose->getNoiseSource());
 
-    noiseSourcesSettingsLayout->addWidget(noiseSourcesView);
-    noiseSourcesGroupBox->setLayout(noiseSourcesSettingsLayout);
+    noiseSrcConfigLayout->addWidget(noiseSourceEditor);
+    noiseSourcesGroupBox->setLayout(noiseSrcConfigLayout);
 
     QVBoxLayout * groupBoxesLayout = new QVBoxLayout();
     groupBoxesLayout->addWidget(outletSettings);
     groupBoxesLayout->addWidget(netDeviceGroupBox);
-    groupBoxesLayout->addWidget(noiseSourcesGroupBox);
+    groupBoxesLayout->addWidget(noiseSourceGroupBox);
 
     QHBoxLayout * buttonsLayout = new QHBoxLayout();
     QPushButton * closeButton = new QPushButton("Close");
