@@ -33,7 +33,8 @@ HEADERS +=  src/MainWindow/mainwindow.h \
             src/PLCGraphicsNodeItem/plcgraphicsnodeitem.h \
             src/PLCGraphicsEdgeItem/plcgraphicsedgeitem.h \
             src/EdgeConfiguration/edgeconfiguration.h \
-            src/PLCSpectrumConfiguration/plcspectrumconfiguration.h
+            src/PLCSpectrumConfiguration/plcspectrumconfiguration.h \
+    src/ZoomSlider/zoomslider.h
 
 SOURCES +=  src/main.cpp \
             src/MainWindow/mainwindow.cpp \
@@ -47,6 +48,7 @@ SOURCES +=  src/main.cpp \
             src/PLCGraphicsEdgeItem/plcgraphicsedgeitem.cpp \
             src/EdgeConfiguration/edgeconfiguration.cpp \
             src/PLCSpectrumConfiguration/plcspectrumconfiguration.cpp\
+    src/ZoomSlider/zoomslider.cpp
 
 
 

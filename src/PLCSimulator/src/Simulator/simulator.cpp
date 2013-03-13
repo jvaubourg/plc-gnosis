@@ -17,8 +17,6 @@
 
 #include "../../lib/QCustomPlot/qcustomplot.h"
 
-
-
 void PLCSimulator::exportTransferData(QString fileName, Ptr<PLC_TransferBase> ctf){
     QFile file("./data/" + fileName + ".dat");
     file.open(QIODevice::Truncate | QIODevice::WriteOnly);
@@ -233,6 +231,9 @@ void PLCSimulator::collectTransferFunctions(){
 
                     qDebug() << "Adding: " << name << "to Bode Widget";
                     bodePlot->addBodePlot(&plotData, name);
+
+                    qDebug() << "Exporting ctf to" << (name + ".dat");
+                    exportTransferData(name, chTransFunc);
                 }
             }
         }

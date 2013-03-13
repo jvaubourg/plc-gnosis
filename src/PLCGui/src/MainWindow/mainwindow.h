@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 #include <QActionGroup>
 #include <QToolBar>
 #include <QSharedMemory>
+#include <QSlider>
 
 #include <QProcess>
 #include "../DiagramEditor/diagrameditor.h"
@@ -46,6 +47,10 @@ protected:
 
     QToolBar * editTools;
     QToolBar * simulationTools;
+    QToolBar * lowerToolbar;
+
+
+
     QActionGroup * editActionGroup;
 
     QAction * saveAction;
