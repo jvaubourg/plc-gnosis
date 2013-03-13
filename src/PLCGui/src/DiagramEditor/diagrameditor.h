@@ -45,6 +45,9 @@ public:
 
     void setScene(QGraphicsScene *scene);
 
+signals:
+    void zoomChanged(double zoom);
+
 public slots:
     void setZoom(double zoom);
 
@@ -55,6 +58,8 @@ protected:
 private:
     QPointF zoomAnchorScene;  /*!< Holds the zoom anchor in scene coordinates */
     QPoint  zoomAnchorView;   /*!< Holds the zoom anchor in the editors coordinates */
+
+    double zoomFactor;
 };
 
 #endif // DIAGRAMEDITOR_H

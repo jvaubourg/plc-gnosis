@@ -33,6 +33,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 #include <QSlider>
 
 #include <QProcess>
+
+#include "../ZoomSlider/zoomslider.h"
 #include "../DiagramEditor/diagrameditor.h"
 #include "../DiagramSheet/diagramsheet.h"
 #include "../PLCSpectrumConfiguration/plcspectrumconfiguration.h"
@@ -49,7 +51,7 @@ protected:
     QToolBar * simulationTools;
     QToolBar * lowerToolbar;
 
-
+    ZoomSlider * zoomSlider;
 
     QActionGroup * editActionGroup;
 

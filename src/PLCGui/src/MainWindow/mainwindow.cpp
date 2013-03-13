@@ -7,7 +7,7 @@
 #include <QElapsedTimer>
 #include <QMenuBar>
 #include <QSharedMemory>
-
+#include <QLabel>
 #include <QFileDialog>
 
 //TODO: All actions should connect to the editor.
@@ -31,14 +31,34 @@ MainWindow::MainWindow(QWidget *parent) :
     simulationTools->setMovable(false);
     simulationTools->setIconSize(QSize(16, 16));
 
+    lowerToolbar = new QToolBar(QString("Misc. Tools"), this);
+    lowerToolbar->setMovable(false);
+
+    zoomSlider = new ZoomSlider(this);
+    zoomSlider->setZoom(1.0);
+
+    QWidget * spacer = new QWidget(this);
+    spacer->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    lowerToolbar->addWidget(spacer);
+    lowerToolbar->addWidget(new QLabel("Zoom:", this));
+    lowerToolbar->addWidget(zoomSlider);
+
+
     this->editActionGroup = new QActionGroup(this);
 
     editor = new DiagramEditor();
+
+    connect(zoomSlider, SIGNAL(zoomChanged(double)), editor, SLOT(setZoom(double)));
+    connect(editor, SIGNAL(zoomChanged(double)), zoomSlider, SLOT(setZoom(double)));
+
     setCentralWidget(editor);
     editor->setFocus();
 
     addToolBar(Qt::LeftToolBarArea, editTools);
     addToolBar(Qt::LeftToolBarArea, simulationTools);
+    addToolBar(Qt::BottomToolBarArea, lowerToolbar);
+
+
 
     createActions();
     createMenus();

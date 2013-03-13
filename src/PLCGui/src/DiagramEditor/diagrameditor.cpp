@@ -51,6 +51,8 @@ DiagramEditor::DiagramEditor()
     zoomAnchorView = QPoint(0, 0);
     zoomAnchorScene = QRectF(mapToScene(zoomAnchorView - QPoint(1, 1)),
                              mapToScene(zoomAnchorView + QPoint(1, 1))).center();
+
+    zoomFactor = 1.0;
 }
 
 /*! This overloaded setScene member function ensures that the set "scene" is actually a diagram
@@ -107,22 +109,28 @@ void DiagramEditor::keyPressEvent(QKeyEvent *event){
 void DiagramEditor::setZoom(double zoom){
     qreal postZoomFactor = zoom;
 
-    postZoomFactor = (postZoomFactor < 0.25)?0.25:postZoomFactor;
-    postZoomFactor = (postZoomFactor > 8.0)?8.0:postZoomFactor;
+    if(zoom != this->zoomFactor){
 
-    qreal zoomFactor = postZoomFactor/transform().m11();
-    scale(zoomFactor, zoomFactor);
+        postZoomFactor = (postZoomFactor < 0.25)?0.25:postZoomFactor;
+        postZoomFactor = (postZoomFactor > 8.0)?8.0:postZoomFactor;
 
-    QPoint posDelta = zoomAnchorView - mapFromScene(zoomAnchorScene);
+        qreal zoomAmount = postZoomFactor/transform().m11();
+        scale(zoomAmount, zoomAmount);
 
-    QScrollBar * vBar = verticalScrollBar();
-    QScrollBar * hBar = horizontalScrollBar();
+        QPoint posDelta = zoomAnchorView - mapFromScene(zoomAnchorScene);
 
-    int hValue = hBar->value() - posDelta.x();
-    int vValue = vBar->value() - posDelta.y();
+        QScrollBar * vBar = verticalScrollBar();
+        QScrollBar * hBar = horizontalScrollBar();
 
-    hBar->setValue(hValue);
-    vBar->setValue(vValue);
+        int hValue = hBar->value() - posDelta.x();
+        int vValue = vBar->value() - posDelta.y();
+
+        hBar->setValue(hValue);
+        vBar->setValue(vValue);
+
+        this->zoomFactor = postZoomFactor;
+        emit zoomChanged(postZoomFactor);
+    }
 }
 
 /*! Handles wheel events for zooming purposes. By taking into account the cursor position
