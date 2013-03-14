@@ -5,6 +5,7 @@
 #include <QStyleOptionGraphicsItem>
 #include "../NodeConfiguration/nodeconfiguration.h"
 
+#include <QDebug>
 #include "edgemodel.h"
 
 #define NODEITEM_RADIUS 20.0
@@ -34,6 +35,8 @@ void PLCGraphicsNodeItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     NodeConfiguration * nodeConfig = new NodeConfiguration(getNodeModel());
     nodeConfig->exec();
     delete nodeConfig;
+    updateLabels();
+    update();
 }
 
 
@@ -42,6 +45,14 @@ PLCGraphicsNodeItem::PLCGraphicsNodeItem(QGraphicsItem *parent) :
 {
     this->node = new NodeModel();
     setupLabelsAndFlags();
+}
+
+void PLCGraphicsNodeItem::updateLabels(){
+    if(!node->netDevices()->isEmpty()){
+        nodeLabel->setPlainText(node->netDevices()->at(0)->getName());
+    }
+
+    nodeLabel->setPlainText("");
 }
 
 PLCGraphicsNodeItem::PLCGraphicsNodeItem(NodeModel* node, QGraphicsItem *parent) :
@@ -72,7 +83,6 @@ void PLCGraphicsNodeItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
         painter->setPen(Qt::black);
     }
 
-
     painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
     painter->setRenderHint(QPainter::Antialiasing, true);
 
@@ -90,27 +100,17 @@ void PLCGraphicsNodeItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
         //Draw circle if has transmitter
         if(node->netDevices()->at(0)->transmitterEnabled()){
             painter->setBrush(Qt::transparent);
-
               painter->drawEllipse(QPointF(0, 0), 0.6*NODEITEM_RADIUS, 0.6*NODEITEM_RADIUS);
         }
 
         //Fill in triangle if has receiver
         if(node->netDevices()->at(0)->receiverEnabled()){
             painter->fillPath(path, QBrush(Qt::black));
-            impedanceLabel->setPlainText("");
-            //impedanceLabel->setPlainText(node->netDevices()->at(0)->getRXImpedance().getValue() + QString::fromUtf8("\u2126"));
-        }
-        else{
-            impedanceLabel->setPlainText("");
-        }
-
-        nodeLabel->setPlainText(node->netDevices()->at(0)->getName());
+         }
     }
     else {
         //Draw basic node
         painter->drawEllipse(QPointF(0, 0), 0.20*NODEITEM_RADIUS, 0.20*NODEITEM_RADIUS);
-        nodeLabel->setPlainText("");
-        impedanceLabel->setPlainText("");
     }
 
 

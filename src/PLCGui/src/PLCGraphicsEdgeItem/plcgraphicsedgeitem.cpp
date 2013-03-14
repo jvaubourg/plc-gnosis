@@ -58,8 +58,6 @@ void PLCGraphicsEdgeItem::setupLabels(){
 
     lengthLabel->setZValue(-5);
     typeLabel->setZValue(-5);
-
-
 }
 
 QRectF PLCGraphicsEdgeItem::boundingRect() const {
@@ -156,6 +154,8 @@ void PLCGraphicsEdgeItem::updateLabelAngle(){
     typeLabel->translate(perpDir.x() * 12.0, perpDir.y() * 12.0);
 
 
+    prepareGeometryChange();
+
     lengthLabel->update();
     typeLabel->update();
 
@@ -174,6 +174,7 @@ void PLCGraphicsEdgeItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     Q_UNUSED(event);
     EdgeConfiguration * edgeConfig = new EdgeConfiguration(getEdgeModel());
     edgeConfig->exec();
+    updateLabelAngle();
     delete edgeConfig;
 }
 
@@ -191,8 +192,8 @@ void PLCGraphicsEdgeItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
         endPoint = toNode->pos();
     }
 
-    updateLabelAngle();
-    prepareGeometryChange();
+
+    //prepareGeometryChange();
     painter->setRenderHints(QPainter::Antialiasing | QPainter::HighQualityAntialiasing, true);
 
     QPen linePen;

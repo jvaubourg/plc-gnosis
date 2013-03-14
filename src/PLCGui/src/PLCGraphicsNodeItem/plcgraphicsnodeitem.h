@@ -57,6 +57,7 @@ private:
     QGraphicsTextItem* impedanceLabel;
 
     void setupLabelsAndFlags();
+    void updateLabels();
 };
 
 #endif // PLCGRAPHICSNODEITEM_H
