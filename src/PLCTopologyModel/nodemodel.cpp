@@ -75,4 +75,19 @@ void NodeModel::fromVariantMap(const QVariantMap& map){
     this->outletImpedance.setValue(map["OutletImpedance"].toString());
 }
 
+void NodeModel::setNetDevice(NetDeviceModel *device){
+    if(this->netDevice != 0){
+        delete (netDevice);
+    }
+
+    this->netDevice = device;
+}
+
+void NodeModel::setNoiseSource(NoiseSourceModel *source){
+    if(this->noiseSource != 0){
+        delete(netDevice);
+    }
+
+    this->noiseSource = source;
+}
 

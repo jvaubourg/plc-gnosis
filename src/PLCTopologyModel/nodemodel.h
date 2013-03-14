@@ -36,6 +36,9 @@ public:
     void fromVariantMap(const QVariantMap& map);
     QVariantMap toVariantMap();
 
+    void setNetDevice(NetDeviceModel* device);
+    void setNoiseSource(NoiseSourceModel* source);
+
 protected:
 
 private:

@@ -32,9 +32,12 @@ class NoiseSourceEditor : public QWidget
     Q_OBJECT
 public:
     explicit NoiseSourceEditor(NoiseSourceModel* source, QWidget *parent = 0);
+    ~NoiseSourceEditor();
     void populateFromModel();
     void saveChanges();
     bool isValid();
+
+    NoiseSourceModel* takeNoiseSource();
 
 signals:
 

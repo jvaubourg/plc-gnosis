@@ -29,6 +29,7 @@ NodeConfiguration::NodeConfiguration(NodeModel *node, QDialog *parent) :
 
     netDeviceSettings = new QGroupBox("Net Device");
     netDeviceSettings->setCheckable(true);
+    netDeviceSettings->setChecked(false);
 
 
     QVBoxLayout* netDevConfigLayout = new QVBoxLayout();
@@ -39,6 +40,7 @@ NodeConfiguration::NodeConfiguration(NodeModel *node, QDialog *parent) :
 
     noiseSourceSettings = new QGroupBox("Noise Source");
     noiseSourceSettings->setCheckable(true);
+    noiseSourceSettings->setChecked(false);
 
     QVBoxLayout* noiseSrcConfigLayout = new QVBoxLayout();
     noiseSourceEditor = new NoiseSourceEditor(node->getNoiseSource(), this);

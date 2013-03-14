@@ -30,8 +30,15 @@ class NetDeviceEditor : public QWidget
     Q_OBJECT
 public:
     explicit NetDeviceEditor(NetDeviceModel* device, QWidget *parent = 0);
+    ~NetDeviceEditor();
+
+
     void saveChanges();
     bool isValid();
+
+    void clearModel();
+    NetDeviceModel* takeNetDevice();
+
 
 signals:
     

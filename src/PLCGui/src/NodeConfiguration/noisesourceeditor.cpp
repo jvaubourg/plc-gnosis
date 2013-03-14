@@ -62,3 +62,15 @@ void NoiseSourceEditor::saveChanges(){
         this->noiseSrcModel->setNoisePSD(noisePSDInput->getValue());
     }
 }
+
+NoiseSourceEditor::~NoiseSourceEditor(){
+    if(noiseSrcModel != 0){
+        delete(noiseSrcModel);
+    }
+}
+
+NoiseSourceModel* NoiseSourceEditor::takeNoiseSource(){
+    NoiseSourceModel* model = noiseSrcModel;
+    noiseSrcModel = 0;
+    return model;
+}

@@ -55,6 +55,18 @@ void NetDeviceEditor::populateFromModel(){
     this->txImpedanceInput->setChecked(netDevModel->transmitterEnabled());
 }
 
+NetDeviceEditor::~NetDeviceEditor(){
+    if(netDevModel != 0){
+        delete(netDevModel);
+    }
+}
+
+NetDeviceModel* NetDeviceEditor::takeNetDevice(){
+    NetDeviceModel* model = netDevModel;
+    netDevModel = 0;
+    return model;
+}
+
 bool NetDeviceEditor::isValid(){
     return (nameEdit->text().length() != 0 && txImpedanceInput->isValid() && rxImpedanceInput->isValid()
             && shuntImpedanceInput->isValid());
