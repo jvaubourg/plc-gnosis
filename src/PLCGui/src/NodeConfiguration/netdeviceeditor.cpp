@@ -55,10 +55,14 @@ void NetDeviceEditor::populateFromModel(){
     this->txImpedanceInput->setChecked(netDevModel->transmitterEnabled());
 }
 
+bool NetDeviceEditor::isValid(){
+    return (nameEdit->text().length() != 0 && txImpedanceInput->isValid() && rxImpedanceInput->isValid()
+            && shuntImpedanceInput->isValid());
+}
+
 void NetDeviceEditor::saveChanges(){
 
-    if(nameEdit->text().length() != 0 && txImpedanceInput->isValid() && rxImpedanceInput->isValid()
-            && shuntImpedanceInput->isValid()){
+    if(isValid()){
 
         this->netDevModel->setName(nameEdit->text());
         this->netDevModel->setTXImpedance(txImpedanceInput->getValue());

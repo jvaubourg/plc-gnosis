@@ -31,6 +31,7 @@ class NetDeviceEditor : public QWidget
 public:
     explicit NetDeviceEditor(NetDeviceModel* device, QWidget *parent = 0);
     void saveChanges();
+    bool isValid();
 
 signals:
     
@@ -40,7 +41,7 @@ protected:
 
 private:
     void populateFromModel();
-    //TODO dropdown for different/more types??
+
     QLineEdit * nameEdit;
 
     PLCDataInputWidget * shuntImpedanceInput;

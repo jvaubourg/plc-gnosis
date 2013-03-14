@@ -1,11 +1,17 @@
-#include "noisesourcedialog.h"
+#include "noisesourceeditor.h"
 #include <QBoxLayout>
 
-NoiseSourceDialog::NoiseSourceDialog(NoiseSourceModel* source, QListWidgetItem* item, QWidget *parent) :
-    QDialog(parent)
+NoiseSourceEditor::NoiseSourceEditor(NoiseSourceModel* source, QWidget *parent) :
+    QWidget(parent)
 {
-    listItem = item;
-    noiseSrcModel = source;
+
+
+    if(source == 0){
+        noiseSrcModel = new NoiseSourceModel();
+    }
+    else{
+        noiseSrcModel = source;
+    }
 
     QLabel * nameLabel = new QLabel("Name:", this);
     nameLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -24,54 +30,35 @@ NoiseSourceDialog::NoiseSourceDialog(NoiseSourceModel* source, QListWidgetItem* 
 
     noisePSDInput = new PLCDataInputWidget("Noise PSD", this);
 
-    QVBoxLayout * dialogLayout = new QVBoxLayout();
-    dialogLayout->addLayout(nameLayout);
-    dialogLayout->addWidget(noisePSDInput);
-    dialogLayout->addWidget(noiseTypeSelector, 0, Qt::AlignCenter);
+    QVBoxLayout * editorLayout = new QVBoxLayout();
+    editorLayout->addLayout(nameLayout);
+    editorLayout->addWidget(noisePSDInput);
+    editorLayout->addWidget(noiseTypeSelector, 0, Qt::AlignCenter);
 
 
-    this->setLayout(dialogLayout);
+    this->setLayout(editorLayout);
 
-    QHBoxLayout * buttonLayout = new QHBoxLayout();
-    QPushButton * acceptButton = new QPushButton("Accept", this);
-    QPushButton * deleteButton = new QPushButton("Remove");
     //deleteButton->setFixedWidth(20);
-
-    buttonLayout->addWidget(acceptButton);
-    buttonLayout->addWidget(deleteButton);
-
-    connect(acceptButton, SIGNAL(clicked()), this, SLOT(acceptClicked()));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-
-    dialogLayout->addLayout(buttonLayout);
 
     populateFromModel();
 
 
 }
 
-void NoiseSourceDialog::populateFromModel(){
+void NoiseSourceEditor::populateFromModel(){
     this->nameEdit->setText(noiseSrcModel->getName());
     this->noiseTypeSelector->setCurrentIndex(noiseTypeSelector->findText(noiseSrcModel->getNoiseType()));
     this->noisePSDInput->setValue(noiseSrcModel->getNoisePSD().getValue());
 }
 
-void NoiseSourceDialog::acceptClicked(){
+bool NoiseSourceEditor::isValid(){
+    return (nameEdit->text().length() != 0 && noisePSDInput->isValid());
+}
 
-    if(nameEdit->text().length() != 0 && noisePSDInput->isValid()){
-        listItem->setText(nameEdit->text());
+void NoiseSourceEditor::saveChanges(){
 
+    if(isValid()){
         this->noiseSrcModel->setName(nameEdit->text());
         this->noiseSrcModel->setNoisePSD(noisePSDInput->getValue());
-
-        accept();
     }
-}
-
-void NoiseSourceDialog::deleteClicked(){
-    done(-1);
-}
-
-void NoiseSourceDialog::closeEvent(QCloseEvent * event){
-    event->ignore();
 }

@@ -3,8 +3,7 @@
 
 #include <QListWidget>
 #include <QPushButton>
-#include "netdeviceeditor.h"
-#include "noisesourcedialog.h"
+
 #include "plcvaluestring.h"
 #include "netdevicemodel.h"
 #include "noisesourcemodel.h"
@@ -28,30 +27,29 @@ NodeConfiguration::NodeConfiguration(NodeModel *node, QDialog *parent) :
     outletSettingsLayout->addWidget(outletImpedanceInput);
     outletSettings->setLayout(outletSettingsLayout);
 
-    QGroupBox* netDeviceGroupBox = new QGroupBox("Net Device");
-    netDeviceGroupBox->setCheckable(true);
+    netDeviceSettings = new QGroupBox("Net Device");
+    netDeviceSettings->setCheckable(true);
 
-    QWidget* netDeviceEditor = new NetDeviceEditor(node->getNetDevice());
-    netDevicesView = new QListWidget();
 
     QVBoxLayout* netDevConfigLayout = new QVBoxLayout();
+    netDeviceEditor = new NetDeviceEditor(node->getNetDevice(), this);
+
     netDevConfigLayout->addWidget(netDeviceEditor);
+    netDeviceSettings->setLayout(netDevConfigLayout);
 
-    netDeviceGroupBox->setLayout(netDevConfigLayout);
-
-    QGroupBox* noiseSourceGroupBox = new QGroupBox("Noise Source");
-    noiseSourceGroupBox->setCheckable(true);
+    noiseSourceSettings = new QGroupBox("Noise Source");
+    noiseSourceSettings->setCheckable(true);
 
     QVBoxLayout* noiseSrcConfigLayout = new QVBoxLayout();
-    QWidget noiseSourceEditor = new NoiseSourceEditor(nose->getNoiseSource());
+    noiseSourceEditor = new NoiseSourceEditor(node->getNoiseSource(), this);
 
     noiseSrcConfigLayout->addWidget(noiseSourceEditor);
-    noiseSourcesGroupBox->setLayout(noiseSrcConfigLayout);
+    noiseSourceSettings->setLayout(noiseSrcConfigLayout);
 
     QVBoxLayout * groupBoxesLayout = new QVBoxLayout();
     groupBoxesLayout->addWidget(outletSettings);
-    groupBoxesLayout->addWidget(netDeviceGroupBox);
-    groupBoxesLayout->addWidget(noiseSourceGroupBox);
+    groupBoxesLayout->addWidget(netDeviceSettings);
+    groupBoxesLayout->addWidget(noiseSourceSettings);
 
     QHBoxLayout * buttonsLayout = new QHBoxLayout();
     QPushButton * closeButton = new QPushButton("Close");
@@ -64,17 +62,9 @@ NodeConfiguration::NodeConfiguration(NodeModel *node, QDialog *parent) :
 
     populateFromModel();
 
-    connect(netDevicesView, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(editNetDevices(QListWidgetItem*)));
-    connect(noiseSourcesView, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(editNoiseSources(QListWidgetItem*)));
-
 }
 
 void NodeConfiguration::populateFromModel(){
-    netDevicesView->clear();
-    noiseSourcesView->clear();
-
-    netDevicesView->addItem("<Add Net Device>");
-    noiseSourcesView->addItem("<Add Noise Source>");
 
     outletSettings->setChecked(nodeModel->getHasOutlet());
     outletImpedanceInput->setValue(nodeModel->getOutletImpedance().getValue());
@@ -107,5 +97,12 @@ void NodeConfiguration::saveAndClose(){
         return;
     }
 
+    if(noiseSourceSettings->isChecked()){
+
+    }
+
+    if(netDeviceSettings->isChecked()){
+
+    }
 
 }
