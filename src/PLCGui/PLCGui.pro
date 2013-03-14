@@ -41,12 +41,12 @@ SOURCES +=  src/main.cpp \
             src/DiagramEditor/diagrameditor.cpp \
             src/NodeConfiguration/nodeconfiguration.cpp \
             src/NodeConfiguration/plcdatainputwidget.cpp \
-            src/NodeConfiguration/noisesourcedialog.cpp \
             src/PLCGraphicsNodeItem/plcgraphicsnodeitem.cpp \
             src/PLCGraphicsEdgeItem/plcgraphicsedgeitem.cpp \
             src/EdgeConfiguration/edgeconfiguration.cpp \
             src/PLCSpectrumConfiguration/plcspectrumconfiguration.cpp\
-    src/NodeConfiguration/netdeviceeditor.cpp
+    src/NodeConfiguration/netdeviceeditor.cpp \
+    src/NodeConfiguration/noisesourceeditor.cpp
 
 
 
