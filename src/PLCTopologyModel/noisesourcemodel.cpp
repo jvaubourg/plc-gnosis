@@ -4,6 +4,7 @@ NoiseSourceModel::NoiseSourceModel()
 {
     this->noiseSourceType = "Static";
     this->noisePSD.setValue("1e-7");
+    this->name = "Noise";
 }
 
 NoiseSourceModel::NoiseSourceModel(const QVariantMap& map){

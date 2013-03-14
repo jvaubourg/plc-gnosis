@@ -85,7 +85,7 @@ void NodeModel::setNetDevice(NetDeviceModel *device){
 
 void NodeModel::setNoiseSource(NoiseSourceModel *source){
     if(this->noiseSource != 0){
-        delete(netDevice);
+        delete(noiseSource);
     }
 
     this->noiseSource = source;

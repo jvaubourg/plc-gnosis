@@ -20,16 +20,28 @@ NodeConfiguration::NodeConfiguration(NodeModel *node, QDialog *parent) :
     //Setup the GUI Components/GroupBoxes etc.
     outletSettings = new QGroupBox("Outlet");
     outletSettings->setCheckable(true);
-    outletSettings->setChecked(false);
+    outletSettings->setChecked(nodeModel->getHasOutlet());
 
     QVBoxLayout* outletSettingsLayout = new QVBoxLayout();
     outletImpedanceInput = new PLCDataInputWidget("Impedance");
     outletSettingsLayout->addWidget(outletImpedanceInput);
     outletSettings->setLayout(outletSettingsLayout);
 
+
+
     netDeviceSettings = new QGroupBox("Net Device");
     netDeviceSettings->setCheckable(true);
-    netDeviceSettings->setChecked(false);
+
+
+    if(nodeModel->getNetDevice() == 0){
+        netDeviceSettings->setChecked(false);
+        nodeModel->setNetDevice(new NetDeviceModel());
+    }
+    else{
+        netDeviceSettings->setChecked(true);
+    }
+
+
 
 
     QVBoxLayout* netDevConfigLayout = new QVBoxLayout();
@@ -40,7 +52,15 @@ NodeConfiguration::NodeConfiguration(NodeModel *node, QDialog *parent) :
 
     noiseSourceSettings = new QGroupBox("Noise Source");
     noiseSourceSettings->setCheckable(true);
-    noiseSourceSettings->setChecked(false);
+
+    if(nodeModel->getNoiseSource() == 0){
+        noiseSourceSettings->setChecked(false);
+        nodeModel->setNoiseSource(new NoiseSourceModel());
+    }
+    else
+    {
+        noiseSourceSettings->setChecked(true);
+    }
 
     QVBoxLayout* noiseSrcConfigLayout = new QVBoxLayout();
     noiseSourceEditor = new NoiseSourceEditor(node->getNoiseSource(), this);
@@ -95,16 +115,22 @@ void NodeConfiguration::saveAndClose(){
     }
     else{
         this->nodeModel->setHasOutlet(false);
-        done(0);
-        return;
     }
 
-    if(noiseSourceSettings->isChecked()){
-
+    if(noiseSourceSettings->isChecked() && noiseSourceEditor->isValid()){
+        noiseSourceEditor->saveChanges();
+    }
+    else{
+        nodeModel->setNoiseSource(0);
     }
 
-    if(netDeviceSettings->isChecked()){
-
+    if(netDeviceSettings->isChecked() && netDeviceEditor->isValid()){
+        netDeviceEditor->saveChanges();
+    }
+    else{
+        nodeModel->setNetDevice(0);
     }
 
+    done(0);
+    return;
 }

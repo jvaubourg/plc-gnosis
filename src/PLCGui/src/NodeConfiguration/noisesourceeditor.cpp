@@ -1,17 +1,14 @@
 #include "noisesourceeditor.h"
 #include <QBoxLayout>
+#include <assert.h>
 
 NoiseSourceEditor::NoiseSourceEditor(NoiseSourceModel* source, QWidget *parent) :
     QWidget(parent)
 {
 
 
-    if(source == 0){
-        noiseSrcModel = new NoiseSourceModel();
-    }
-    else{
-        noiseSrcModel = source;
-    }
+    noiseSrcModel = source;
+    assert(noiseSrcModel != 0);
 
     QLabel * nameLabel = new QLabel("Name:", this);
     nameLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -56,21 +53,8 @@ bool NoiseSourceEditor::isValid(){
 }
 
 void NoiseSourceEditor::saveChanges(){
-
     if(isValid()){
         this->noiseSrcModel->setName(nameEdit->text());
         this->noiseSrcModel->setNoisePSD(noisePSDInput->getValue());
     }
-}
-
-NoiseSourceEditor::~NoiseSourceEditor(){
-    if(noiseSrcModel != 0){
-        delete(noiseSrcModel);
-    }
-}
-
-NoiseSourceModel* NoiseSourceEditor::takeNoiseSource(){
-    NoiseSourceModel* model = noiseSrcModel;
-    noiseSrcModel = 0;
-    return model;
 }

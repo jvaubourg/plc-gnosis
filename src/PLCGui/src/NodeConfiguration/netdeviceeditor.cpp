@@ -1,14 +1,12 @@
 #include "netdeviceeditor.h"
 #include <QHBoxLayout>
+#include <assert.h>
 
 NetDeviceEditor::NetDeviceEditor(NetDeviceModel* device, QWidget *parent) :
     QWidget(parent)
 {
     netDevModel = device;
-
-    if(netDevModel == 0){
-        netDevModel = new NetDeviceModel();
-    }
+    assert(netDevModel != 0);
 
     QLabel * nameLabel = new QLabel("Name:", this);
     nameLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -55,12 +53,6 @@ void NetDeviceEditor::populateFromModel(){
     this->txImpedanceInput->setChecked(netDevModel->transmitterEnabled());
 }
 
-NetDeviceEditor::~NetDeviceEditor(){
-    if(netDevModel != 0){
-        delete(netDevModel);
-    }
-}
-
 NetDeviceModel* NetDeviceEditor::takeNetDevice(){
     NetDeviceModel* model = netDevModel;
     netDevModel = 0;
@@ -74,20 +66,18 @@ bool NetDeviceEditor::isValid(){
 
 void NetDeviceEditor::saveChanges(){
 
-    if(isValid()){
+    this->netDevModel->setName(nameEdit->text());
+    this->netDevModel->setTXImpedance(txImpedanceInput->getValue());
+    this->netDevModel->setRXImpedance(rxImpedanceInput->getValue());
 
-        this->netDevModel->setName(nameEdit->text());
-        this->netDevModel->setTXImpedance(txImpedanceInput->getValue());
-        this->netDevModel->setRXImpedance(rxImpedanceInput->getValue());
-
-        if(shuntImpedanceInput->isChecked()){
-            this->netDevModel->setShuntImpedance(shuntImpedanceInput->getValue());
-        }
-        else{
-            this->netDevModel->setShuntImpedance("");
-        }
-
-        this->netDevModel->setReceiverEnabled(rxImpedanceInput->isChecked());
-        this->netDevModel->setTransmitterEnabled(txImpedanceInput->isChecked());
+    if(shuntImpedanceInput->isChecked()){
+        this->netDevModel->setShuntImpedance(shuntImpedanceInput->getValue());
     }
+    else{
+        this->netDevModel->setShuntImpedance("");
+    }
+
+    this->netDevModel->setReceiverEnabled(rxImpedanceInput->isChecked());
+    this->netDevModel->setTransmitterEnabled(txImpedanceInput->isChecked());
+
 }
