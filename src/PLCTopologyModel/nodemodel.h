@@ -20,8 +20,12 @@ public:
     bool getHasOutlet() {return hasOutlet;}
     void setOutletImpedance(PLCValueString outletImpedance){this->outletImpedance = outletImpedance;}
     PLCValueString getOutletImpedance() { return outletImpedance; }
-    QList<NetDeviceModel *> * netDevices() {return &associatedNetDevices;}
-    QList<NoiseSourceModel *> * noiseSources() {return &associatedNoiseSources;}
+
+    NetDeviceModel* getNetDevice() { return netDevice; }
+    NoiseSourceModel* getNoiseSource(){ return noiseSource; }
+
+    //QList<NetDeviceModel *> * netDevices() {return &associatedNetDevices;}
+    //QList<NoiseSourceModel *> * noiseSources() {return &associatedNoiseSources;}
 
     QString getName(){ return name; }
     void setName(const QString& newName){name = newName;}
@@ -32,6 +36,9 @@ public:
     void fromVariantMap(const QVariantMap& map);
     QVariantMap toVariantMap();
 
+    void setNetDevice(NetDeviceModel* device);
+    void setNoiseSource(NoiseSourceModel* source);
+
 protected:
 
 private:
@@ -40,8 +47,8 @@ private:
     bool hasOutlet;
     PLCValueString outletImpedance;
 
-    QList<NetDeviceModel *> associatedNetDevices;
-    QList<NoiseSourceModel*> associatedNoiseSources;
+    NetDeviceModel * netDevice;
+    NoiseSourceModel* noiseSource;
 
     QPointF position;
 

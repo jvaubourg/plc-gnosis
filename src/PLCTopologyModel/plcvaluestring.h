@@ -20,7 +20,7 @@ public:
     bool isFile();
 
     QString getValue();
-    bool setValue(const QString& value);
+    void setValue(const QString& value);
 
     double getReal();
     double getImaginary();

@@ -17,9 +17,8 @@ QString PLCValueString::getValue(){
     return this->value;
 }
 
-bool PLCValueString::setValue(const QString &value){
+void PLCValueString::setValue(const QString &value){
     this->value = value;
-    return isValid();
 }
 
 bool PLCValueString::isValid(){

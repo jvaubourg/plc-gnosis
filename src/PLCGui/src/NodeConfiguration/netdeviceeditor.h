@@ -17,42 +17,44 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 */
 
-#ifndef NOISESOURCEDIALOG_H
-#define NOISESOURCEDIALOG_H
+#ifndef NETDEVICEDIALOG_H
+#define NETDEVICEDIALOG_H
 
-#include <QDialog>
-#include "noisesourcemodel.h"
+#include "netdevicemodel.h"
 #include "plcdatainputwidget.h"
 #include <QListWidgetItem>
-#include <QComboBox>
 #include <QCloseEvent>
 
-class NoiseSourceDialog : public QDialog
+class NetDeviceEditor : public QWidget
 {
     Q_OBJECT
 public:
-    explicit NoiseSourceDialog(NoiseSourceModel* source, QListWidgetItem* item, QWidget *parent);
-    void populateFromModel();
+    explicit NetDeviceEditor(NetDeviceModel* device, QWidget *parent = 0);
+
+
+    void saveChanges();
+    bool isValid();
+
+    void clearModel();
+    NetDeviceModel* takeNetDevice();
+
 
 signals:
-
-protected:
-    virtual void closeEvent(QCloseEvent *event);
     
 public slots:
-    void acceptClicked();
-    void deleteClicked();
+
+protected:
 
 private:
-    QComboBox* noiseTypeSelector;
-    QLineEdit* nameEdit;
-    PLCDataInputWidget * noisePSDInput;
+    void populateFromModel();
 
-    QListWidgetItem* listItem;
+    QLineEdit * nameEdit;
 
-    NoiseSourceModel * noiseSrcModel;
+    PLCDataInputWidget * shuntImpedanceInput;
+    PLCDataInputWidget * txImpedanceInput;
+    PLCDataInputWidget * rxImpedanceInput;
 
-    //TODO Investigate using a QVariantList for other parameters
+    NetDeviceModel* netDevModel;
 };
 
-#endif // NOISESOURCEDIALOG_H
+#endif // NETDEVICEDIALOG_H

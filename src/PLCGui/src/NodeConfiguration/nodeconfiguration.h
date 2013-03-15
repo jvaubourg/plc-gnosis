@@ -25,6 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 #include "nodemodel.h"
 #include "plcdatainputwidget.h"
 
+#include "../NodeConfiguration/noisesourceeditor.h"
+#include "../NodeConfiguration/netdeviceeditor.h"
+
 #include <QListWidget>
 #include <QGroupBox>
 
@@ -42,8 +45,6 @@ protected:
     virtual void closeEvent(QCloseEvent * event);
     
 public slots:
-    void editNetDevices(QListWidgetItem* item);
-    void editNoiseSources(QListWidgetItem* item);
     void saveAndClose();
 
 
@@ -52,11 +53,12 @@ private:
     NodeModel* nodeModel;
 
     QGroupBox* outletSettings;
+    QGroupBox* netDeviceSettings;
+    QGroupBox* noiseSourceSettings;
 
     PLCDataInputWidget* outletImpedanceInput;
-
-    QListWidget* netDevicesView;
-    QListWidget* noiseSourcesView;
+    NetDeviceEditor* netDeviceEditor;
+    NoiseSourceEditor* noiseSourceEditor;
 
     void populateFromModel();
 };

@@ -19,17 +19,6 @@ int main(int argc, char* argv[]){
     MainWindow mainWindow;
     mainWindow.show();
 
-    //NodeModel nodeModelTest;
-    //NodeConfiguration cfg(&nodeModelTest);
-
-    NodeModel * node = new NodeModel();
-    QList<NoiseSourceModel *> * noises = node->noiseSources();
-    QList<NetDeviceModel *> * ndevices = node->netDevices();
-
-    noises->append(new NoiseSourceModel());
-    ndevices->append(new NetDeviceModel());
-    node->setHasOutlet(true);
-
 
     //cfg.show();
 

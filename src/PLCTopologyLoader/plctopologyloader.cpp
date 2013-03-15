@@ -43,20 +43,20 @@ PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
         nodesByName[currentNode->getName()] = newNode;
 
         //Loop through nodes net devices and create as necessary
-        for(int j = 0; j < currentNode->netDevices()->length(); j++)
+        if(currentNode->getNetDevice() != 0)
         {
-            Ptr<PLC_NetDevice> newNetDevice = fromNetDeviceModel(currentNode->netDevices()->at(j), sm, newNode);
-            QString netDeviceName = currentNode->netDevices()->at(j)->getName();
+            Ptr<PLC_NetDevice> newNetDevice = fromNetDeviceModel(currentNode->getNetDevice(), sm, newNode);
+            QString netDeviceName = currentNode->getNetDevice()->getName();
 
             this->netDevices.push_back(newNetDevice);
             this->netDeviceNames.push_back(netDeviceName);
 
-            if(currentNode->netDevices()->at(j)->receiverEnabled()){
+            if(currentNode->getNetDevice()->receiverEnabled()){
                 this->receivers.push_back(newNetDevice);
                 this->receiverNames.push_back(netDeviceName);
             }
 
-            if(currentNode->netDevices()->at(j)->transmitterEnabled()){
+            if(currentNode->getNetDevice()->transmitterEnabled()){
                 this->transmitters.push_back(newNetDevice);
                 this->transmitterNames.push_back(netDeviceName);
             }
@@ -67,13 +67,8 @@ PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
         }
 
         //Loop Through Node noise sources and create as necessary.
-        for(QList<NoiseSourceModel*>::iterator it = currentNode->noiseSources()->begin();
-            it != currentNode->noiseSources()->end(); it++)
-        {
-            Ptr<PLC_NoiseSource> newNoiseSource = fromNoiseSourceModel((*it), sm, newNode);
-        }
-
-        if(currentNode->noiseSources()->length() != 0){
+        if(currentNode->getNoiseSource() != 0){
+            Ptr<PLC_NoiseSource> newNoiseSource = fromNoiseSourceModel(currentNode->getNoiseSource(), sm, newNode);
             this->noiseSources.push_back(newNode);
         }
     }
