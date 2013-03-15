@@ -24,13 +24,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 #include "edgemodel.h"
 #include "../PLCGraphicsNodeItem/plcgraphicsnodeitem.h"
 #include <QGraphicsTextItem>
+#include <QFontMetricsF>
+#include <QPen>
 
 class PLCGraphicsEdgeItem : public QGraphicsItem
 {
 public:
 
     enum {Type = UserType + 2};
-    //explicit PLCGraphicsEdgeItem(QGraphicsItem *parent = 0);
+
     explicit PLCGraphicsEdgeItem(EdgeModel* edge, QGraphicsItem* parent = 0);
     explicit PLCGraphicsEdgeItem(PLCGraphicsNodeItem * fromNode, QPointF toPoint, QGraphicsItem* parent = 0);
     explicit PLCGraphicsEdgeItem(EdgeModel *edge, PLCGraphicsNodeItem* fromNode, PLCGraphicsNodeItem* toNode);
@@ -39,18 +41,19 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                   QWidget *widget);
+
     virtual int type() const { return Type; }
+
     QRectF boundingRect() const;
 
     void setToPoint(QPointF point);
     void setToNode(PLCGraphicsNodeItem * node);
+
     PLCGraphicsNodeItem* getFromNode() { return fromNode; }
 
     EdgeModel* getEdgeModel(){ return edge; }
 
-signals:
-
-public slots:
+    void updateGeometry();
 
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
@@ -61,13 +64,21 @@ private:
     PLCGraphicsNodeItem * fromNode;
     PLCGraphicsNodeItem * toNode;
 
-    QGraphicsTextItem* lengthLabel;
-    QGraphicsTextItem* typeLabel;
+    QString lengthText;
 
     QPointF toPoint;
 
-    void setupLabels();
-    void updateLabelAngle();
+    static QFont labelFont;
+    QFontMetricsF fontMetrics;
+
+    QPen linePen;
+
+    double length, height;
+    double lengthTextWidth;
+    double nameTextWidth;
+    QRectF cachedBoundingRect;
+
+    void setup();
 };
 
 #endif // PLCGRAPHICSEDGEITEM_H

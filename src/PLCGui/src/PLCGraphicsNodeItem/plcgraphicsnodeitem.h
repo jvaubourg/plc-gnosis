@@ -25,6 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 
 class EdgeModel;
+class PLCGraphicsEdgeItem;
+
 class PLCGraphicsNodeItem : public QGraphicsItem
 {
 
@@ -41,15 +43,14 @@ public:
     QRectF boundingRect() const;
 
     NodeModel* getNodeModel(){ return node; }
-    QList<EdgeModel*> associatedEdges;
+    void installEdge(PLCGraphicsEdgeItem* edge);
+    void uninstallEdge(PLCGraphicsEdgeItem* edge);
     
-signals:
-    
-public slots:
 
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+
 
 private:
     NodeModel* node;
@@ -58,6 +59,8 @@ private:
 
     void setupLabelsAndFlags();
     void updateLabels();
+
+    QList<PLCGraphicsEdgeItem *> associatedEdges;
 };
 
 #endif // PLCGRAPHICSNODEITEM_H

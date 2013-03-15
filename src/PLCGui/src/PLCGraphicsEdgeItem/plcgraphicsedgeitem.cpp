@@ -1,180 +1,110 @@
 #include "plcgraphicsedgeitem.h"
 #include <QPainter>
 #include <QDebug>
+#include <algorithm>
+
 #include "../EdgeConfiguration/edgeconfiguration.h"
 
+QFont PLCGraphicsEdgeItem::labelFont("Ariel", 12);
+
+
 PLCGraphicsEdgeItem::PLCGraphicsEdgeItem(PLCGraphicsNodeItem *fromNode, QPointF toPoint, QGraphicsItem *parent) :
-    QGraphicsItem(parent)
+    QGraphicsItem(parent), fontMetrics(labelFont)
 {
     Q_ASSERT(fromNode != 0);
 
-
     this->edge = new EdgeModel(fromNode->getNodeModel()->getName(), "Disconnected");
-    setupLabels();
     this->fromNode = fromNode;
     this->toNode = 0;
 
-    this->setZValue(10);
-
     setToPoint(toPoint);
-    setFlags(QGraphicsItem::ItemIsSelectable);
 
-
+    setup();
 }
 
-PLCGraphicsEdgeItem::PLCGraphicsEdgeItem(EdgeModel* edge, PLCGraphicsNodeItem* fromNode, PLCGraphicsNodeItem* toNode){
+PLCGraphicsEdgeItem::PLCGraphicsEdgeItem(EdgeModel* edge, PLCGraphicsNodeItem* fromNode, PLCGraphicsNodeItem* toNode) :
+    fontMetrics(labelFont)
+{
     this->edge = edge;
-    setupLabels();
     this->fromNode = fromNode;
     setToNode(toNode);
 
+    setup();
+}
+
+void PLCGraphicsEdgeItem::setup(){
     setZValue(-1);
     setFlags(QGraphicsItem::ItemIsSelectable);
 
+    linePen = QPen(Qt::black);
+
+    labelFont = QFont("Consolas", 12);
+    fontMetrics = QFontMetricsF(labelFont);
+
+    fromNode->installEdge(this);
+
+    updateGeometry();
 }
 
 PLCGraphicsEdgeItem::~PLCGraphicsEdgeItem(){
     delete(this->edge);
+
+    fromNode->uninstallEdge(this);
+    if(toNode != 0){
+        toNode->uninstallEdge(this);
+    }
 }
 
-void PLCGraphicsEdgeItem::setupLabels(){
-    this->lengthLabel = new QGraphicsTextItem(QString::number(edge->getLength()) + "m", this);
+void PLCGraphicsEdgeItem::updateGeometry(){
+    prepareGeometryChange();
 
-    this->lengthLabel->setZValue(-1);
-    this->lengthLabel->setFlag(QGraphicsItem::ItemStacksBehindParent);
+    lengthText = QString::number(edge->getLength()) + "m";
 
-    QFont labelFont("Ariel", 12);
-    labelFont.setHintingPreference(QFont::PreferNoHinting);
-    labelFont.setStyleStrategy(QFont::PreferAntialias);
-    lengthLabel->setVisible(true);
-    lengthLabel->setFont(labelFont);
+    lengthTextWidth = fontMetrics.boundingRect(lengthText).width();
+    nameTextWidth = fontMetrics.boundingRect(edge->getName()).width();
 
-    this->typeLabel = new QGraphicsTextItem(edge->getCableType(), this);
-    this->typeLabel->setZValue(-1);
-    this->lengthLabel->setFlag(QGraphicsItem::ItemStacksBehindParent);
+    QPointF startPoint = fromNode->pos();
+    QPointF endPoint = (toNode == 0)?toPoint:toNode->pos();
+    QPointF midPoint = (startPoint + endPoint)/2.0;
 
-    typeLabel->setVisible(true);
-    typeLabel->setFont(labelFont);
+    double dx = (endPoint.rx() - startPoint.rx());
+    double dy = (endPoint.ry() - startPoint.ry());
+    length = sqrt((dx*dx) + (dy*dy));
 
-    lengthLabel->setZValue(-5);
-    typeLabel->setZValue(-5);
+    double brLength = std::max(lengthTextWidth, std::max(nameTextWidth, length)) + linePen.widthF();
+    double theta = atan2(-dy, dx)*180.0/acos(-1);
+
+    //setTransform(QTransform::fromScale(1, -1), false);
+    setPos(midPoint);
+    setRotation(-theta);
+
+    height = 2.0*fontMetrics.leading() + 2.0*fontMetrics.height();
+    height += linePen.widthF();
+
+    cachedBoundingRect = QRectF(-brLength/2.0, -height/2.0, brLength, height).normalized();
 }
 
 QRectF PLCGraphicsEdgeItem::boundingRect() const {
-    if(toNode != 0){
-        QRectF br(fromNode->pos(), toNode->pos());
-        br = br.normalized();
-
-        if(br.width() < 20){
-            br.adjust(-10, 0, 10, 0);
-        }
-
-        if(br.height() < 20){
-            br.adjust(0, -10, 0, 10);
-        }
-
-        return br;
-    }
-
-    QRectF br(fromNode->pos(), toPoint);
-
-    br = br.normalized();
-
-    if(br.width() < 20){
-        br.adjust(-10, 0, 10, 0);
-    }
-
-    if(br.height() < 20){
-        br.adjust(0, -10, 0, 10);
-    }
-
-    return br;
+    return cachedBoundingRect;
 }
 
 void PLCGraphicsEdgeItem::setToPoint(QPointF point){
     this->toPoint = point;
-
-    updateLabelAngle();
-
-    prepareGeometryChange();
-    update();
-
-}
-
-
-void PLCGraphicsEdgeItem::updateLabelAngle(){
-    QPointF endPoint;
-
-    if(toNode == 0){
-        endPoint = toPoint;
-    }
-    else{
-        endPoint = toNode->pos();
-    }
-
-    lengthLabel->setPlainText(QString::number(edge->getLength()) + "m");
-    typeLabel->setPlainText(edge->getName());
-
-    lengthLabel->setVisible(getEdgeModel()->isCableModel());
-
-//    if(edge->isCableModel()){
-//        typeLabel->setPlainText(edge->getCableType());
-//    }
-//    else{
-//        typeLabel->setPlainText("Two-Port Network");
-//    }
-
-
-    QPointF lineVector = endPoint - fromNode->pos();
-    double lineLength = sqrt((lineVector.x() * lineVector.x()) +
-                      (lineVector.y() * lineVector.y()));
-    QPointF lineUnit = lineVector/lineLength;
-
-    QPointF perpDir = QPointF(-lineUnit.y(), lineUnit.x());
-
-    if(lineUnit.y() >= 0 && perpDir.y() <= 0){
-        //perpDir *= -1.0;
-    }
-
-    double labelAngle = atan2(lineVector.y(), lineVector.x());
-    labelAngle *= abs((90.0/asin(-1)));
-
-    lengthLabel->setRotation(labelAngle);
-    typeLabel->setRotation(labelAngle);
-
-    QPointF centerPos = fromNode->pos() + (lineVector/2.0);
-
-    QPointF lengthLabelCenter = lengthLabel->mapToScene(lengthLabel->boundingRect().center());
-    QPointF typeLabelCenter = typeLabel->mapToScene(typeLabel->boundingRect().center());
-
-    lengthLabel->setPos(lengthLabel->pos() + (centerPos - lengthLabelCenter));
-    lengthLabel->translate(perpDir.x() * -12.0, perpDir.y() * -12.0);
-
-    typeLabel->setPos(typeLabel->pos() + (centerPos - typeLabelCenter));
-    typeLabel->translate(perpDir.x() * 12.0, perpDir.y() * 12.0);
-
-
-    prepareGeometryChange();
-
-    lengthLabel->update();
-    typeLabel->update();
-
+    updateGeometry();
 }
 
 void PLCGraphicsEdgeItem::setToNode(PLCGraphicsNodeItem *node){
     this->toNode = node;
     this->edge->setToNode(node->getNodeModel()->getName());
-
-    prepareGeometryChange();
-    updateLabelAngle();
-    update();
+    toNode->installEdge(this);
+    updateGeometry();
 }
 
 void PLCGraphicsEdgeItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event){
     Q_UNUSED(event);
     EdgeConfiguration * edgeConfig = new EdgeConfiguration(getEdgeModel());
     edgeConfig->exec();
-    updateLabelAngle();
+    updateGeometry();
     delete edgeConfig;
 }
 
@@ -183,32 +113,24 @@ void PLCGraphicsEdgeItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
     Q_UNUSED(option)
     Q_UNUSED(widget)
 
-    QPointF endPoint;
-
-    if(toNode == 0){
-        endPoint = toPoint;
-    }
-    else {
-        endPoint = toNode->pos();
-    }
-
-
-    //prepareGeometryChange();
-    painter->setRenderHints(QPainter::Antialiasing | QPainter::HighQualityAntialiasing, true);
-
-    QPen linePen;
+    QPen drawPen = linePen;
+    QBrush drawBrush(Qt::black);
 
     if(this->isSelected()){
-        linePen.setColor(Qt::magenta);
-    }
-    else {
-        linePen.setColor(Qt::black);
+        drawPen.setColor(Qt::magenta);
+        drawBrush.setColor(Qt::magenta);
     }
 
     if(!this->edge->isCableModel()){
         linePen.setStyle(Qt::DashDotLine);
     }
 
-    painter->setPen(linePen);
-    painter->drawLine(fromNode->pos(), endPoint);
+    painter->setRenderHints(QPainter::Antialiasing | QPainter::HighQualityAntialiasing, true);
+
+    painter->setPen(drawPen);
+    painter->setBrush(drawBrush);
+    painter->drawLine(-length/2.0, 0, length/2.0, 0.0);
+
+    painter->drawText(-lengthTextWidth/2.0, -fontMetrics.descent() - linePen.widthF()/2.0, lengthText);
+    painter->drawText(-nameTextWidth/2.0, fontMetrics.ascent() + linePen.widthF()/2.0, edge->getName());
 }

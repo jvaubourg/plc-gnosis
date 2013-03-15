@@ -3,10 +3,13 @@
 #include <QPainterPath>
 #include <math.h>
 #include <QStyleOptionGraphicsItem>
-#include "../NodeConfiguration/nodeconfiguration.h"
 
+#include "../NodeConfiguration/nodeconfiguration.h"
+#include "../PLCGraphicsEdgeItem/plcgraphicsedgeitem.h"
 #include <QDebug>
 #include "edgemodel.h"
+
+
 
 #define NODEITEM_RADIUS 20.0
 #define NODE_RECT 0.707*NODEITEM_RADIUS
@@ -137,6 +140,27 @@ int PLCGraphicsNodeItem::type() const{
 }
 
 
+
+void PLCGraphicsNodeItem::installEdge(PLCGraphicsEdgeItem * newEdge){
+
+    if(newEdge == 0){
+        return;
+    }
+
+    foreach(PLCGraphicsEdgeItem* edge, associatedEdges){
+        if(newEdge == edge){
+            return;
+        }
+    }
+
+    associatedEdges.append(newEdge);
+}
+
+void PLCGraphicsNodeItem::uninstallEdge(PLCGraphicsEdgeItem * edge){
+    associatedEdges.removeAll(edge);
+}
+
+
 QVariant PLCGraphicsNodeItem::itemChange(GraphicsItemChange change, const QVariant &value){
     if(change == QGraphicsItem::ItemPositionChange){
         QPointF pos = value.toPointF();
@@ -150,6 +174,10 @@ QVariant PLCGraphicsNodeItem::itemChange(GraphicsItemChange change, const QVaria
 
     if(change == QGraphicsItem::ItemPositionHasChanged){
         this->getNodeModel()->setPosition(value.toPointF());
+
+        foreach (PLCGraphicsEdgeItem* edge, associatedEdges){
+            edge->updateGeometry();
+        }
     }
 
     return value;
