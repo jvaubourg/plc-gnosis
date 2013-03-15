@@ -60,6 +60,21 @@ void NodeModel::fromVariantMap(const QVariantMap& map){
     QVariantMap netDeviceMap = map["NetDevice"].toMap();
     QVariantMap noiseSourceMap = map["NoiseSource"].toMap();
 
+    //Migration for older versions of the dgm files.
+    if(netDeviceMap.isEmpty()){
+        QVariantList netDevicesList = map["NetDevices"].toList();
+        if(!netDevicesList.isEmpty()){
+            netDeviceMap = netDevicesList.at(0).toMap();
+        }
+    }
+
+    if(noiseSourceMap.isEmpty()){
+        QVariantList noiseSourcesList = map["NoiseSources"].toList();
+        if(!noiseSourcesList.isEmpty()){
+            noiseSourceMap = noiseSourcesList.at(0).toMap();
+        }
+    }
+
     name = map["Name"].toString();
     position = QPointF(pos.at(0).toDouble(), pos.at(1).toDouble());
 
