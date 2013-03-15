@@ -42,8 +42,6 @@ void ZoomSlider::setZoomValue(int zoomValue){
         zoomFactor = newZoom;
         emit zoomChanged(newZoom);
     }
-
-    qDebug() << "New Zoom Value:" << newZoom << zoomValue;
 }
 
 void ZoomSlider::setZoomResolution(int newZoomResolution){
@@ -58,7 +56,6 @@ void ZoomSlider::setZoomResolution(int newZoomResolution){
 }
 
 void ZoomSlider::setZoom(double newZoom){
-    qDebug() << "Slot zoom";
     if(this->zoomFactor != newZoom){
         this->zoomFactor = newZoom;
         adjustSlider();
