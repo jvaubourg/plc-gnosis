@@ -1,2 +1,2 @@
-include(plc-gui-project.pri)
+include(plc-gnosis-project.pri)
 
