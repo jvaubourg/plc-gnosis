@@ -55,6 +55,7 @@ protected:
 
     QActionGroup * editActionGroup;
 
+    QAction * newAction;
     QAction * saveAction;
     QAction * saveAsAction;
     QAction * openAction;

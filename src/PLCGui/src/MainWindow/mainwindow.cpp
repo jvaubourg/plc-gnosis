@@ -69,6 +69,12 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 void MainWindow::createActions(){
+
+    newAction = new QAction("&New", this);
+    newAction->setShortcut(QKeySequence::New);
+    newAction->setToolTip("Closes the currently open sheet and opens a new one");
+    connect(newAction, SIGNAL(triggered()), this, SLOT(newSheet()));
+
     saveAction = new QAction("&Save", this);
     saveAction->setShortcut(QKeySequence::Save);
     saveAction->setToolTip("Save current diagram to disk");
@@ -132,8 +138,7 @@ void MainWindow::setCurrentSheet(DiagramSheet* sheet){
     }
 
     if(sheet == 0){
-        setCurrentSheet(new DiagramSheet());
-        return;
+        sheet = new DiagramSheet();
     }
 
     currentSheet = sheet;
@@ -191,6 +196,7 @@ void MainWindow::loadSheet(){
 void MainWindow::createMenus(){
     fileMenu = this->menuBar()->addMenu("&File");
 
+    fileMenu->addAction(newAction);
     fileMenu->addAction(saveAction);
     fileMenu->addAction(saveAsAction);
     fileMenu->addAction(openAction);
