@@ -1,4 +1,4 @@
-include(../plc-project-common.pri)
+include(../plc-gnosis-common.pri)
 include(../plc-ns3-common.pri)
 
 #Setup required Qt modules
@@ -28,15 +28,13 @@ HEADERS +=  src/MainWindow/mainwindow.h \
             src/DiagramEditor/diagrameditor.h \
             src/NodeConfiguration/nodeconfiguration.h \
             src/NodeConfiguration/plcdatainputwidget.h \
-            src/NodeConfiguration/netdevicedialog.h \
-            src/NodeConfiguration/noisesourcedialog.h \
             src/PLCGraphicsNodeItem/plcgraphicsnodeitem.h \
             src/PLCGraphicsEdgeItem/plcgraphicsedgeitem.h \
             src/EdgeConfiguration/edgeconfiguration.h \
             src/PLCSpectrumConfiguration/plcspectrumconfiguration.h \
-			src/NodeConfiguration/netdeviceeditor.h \
-			src/NodeConfiguration/noisesourceeditor.h
-			src/ZoomSlider/zoomslider.h
+            src/NodeConfiguration/netdeviceeditor.h \
+            src/NodeConfiguration/noisesourceeditor.h \
+            src/ZoomSlider/zoomslider.h
 
 SOURCES +=  src/main.cpp \
             src/MainWindow/mainwindow.cpp \
@@ -44,15 +42,13 @@ SOURCES +=  src/main.cpp \
             src/DiagramEditor/diagrameditor.cpp \
             src/NodeConfiguration/nodeconfiguration.cpp \
             src/NodeConfiguration/plcdatainputwidget.cpp \
-            src/NodeConfiguration/netdevicedialog.cpp \
-            src/NodeConfiguration/noisesourcedialog.cpp \
             src/PLCGraphicsNodeItem/plcgraphicsnodeitem.cpp \
             src/PLCGraphicsEdgeItem/plcgraphicsedgeitem.cpp \
             src/EdgeConfiguration/edgeconfiguration.cpp \
-            src/PLCSpectrumConfiguration/plcspectrumconfiguration.
-        	src/ZoomSlider/zoomslider.cpp
-			src/NodeConfiguration/netdeviceeditor.cpp \
-    		src/NodeConfiguration/noisesourceeditor.cpp
+            src/PLCSpectrumConfiguration/plcspectrumconfiguration.cpp \
+            src/ZoomSlider/zoomslider.cpp \
+            src/NodeConfiguration/netdeviceeditor.cpp \
+            src/NodeConfiguration/noisesourceeditor.cpp
 
 
 

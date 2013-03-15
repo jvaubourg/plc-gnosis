@@ -51,7 +51,7 @@ PLCGraphicsNodeItem::PLCGraphicsNodeItem(QGraphicsItem *parent) :
 }
 
 void PLCGraphicsNodeItem::updateLabels(){
-    if(!node->netDevices()->isEmpty()){
+    if(node->getNetDevice() != 0){
         nodeLabel->setPlainText(node->getNetDevice()->getName());
     }
 
