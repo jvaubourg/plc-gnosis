@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-include(../plc-project-common.pri)
+include(../plc-gnosis-common.pri)
 include(../plc-ns3-common.pri)
 
 #Setup destination for binaries and temp files
