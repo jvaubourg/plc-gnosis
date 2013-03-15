@@ -9,6 +9,8 @@ PLCSpectrumModel::PLCSpectrumModel()
     this->mainsFrequency = 50;
     this->samplesPerCycle = 50;
     this->simulationLength = 1.0;
+
+    this->noiseFloor = 1e-7;
 }
 
 PLCSpectrumModel::PLCSpectrumModel(const QVariantMap& map){
