@@ -10,7 +10,6 @@ DEPENDPATH += $$PWD
 DEFINES += PLCTOPOLOGYMODEL_MAKEDLL
 
 HEADERS += \
-    plctopologyloader_export.h \
     plctopologyloader.h
 
 SOURCES += \

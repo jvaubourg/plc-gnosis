@@ -41,9 +41,6 @@ NodeConfiguration::NodeConfiguration(NodeModel *node, QDialog *parent) :
         netDeviceSettings->setChecked(true);
     }
 
-
-
-
     QVBoxLayout* netDevConfigLayout = new QVBoxLayout();
     netDeviceEditor = new NetDeviceEditor(node->getNetDevice(), this);
 

@@ -5,6 +5,7 @@
 #include <ns3/object.h>
 #include <ns3/ptr.h>
 
+#include <QtCore/qglobal.h>
 #include <QStringList>
 #include <QDebug>
 
@@ -12,7 +13,17 @@
 
 #include "plctopologymodel.h"
 
-#include "plctopologyloader_export.h"
+#ifndef PLCTOPOLOGYLOADER_EXPORT
+    #if defined(PLCTOPOLOGYMODEL_MAKEDLL)
+        /* We are building this library */
+        #define PLCTOPOLOGYLOADER_EXPORT Q_DECL_EXPORT
+
+    #else
+        /* We are using this library */
+        #define PLCTOPOLOGYLOADER_EXPORT Q_DECL_IMPORT
+
+    # endif
+#endif
 
 using namespace ns3;
 using namespace std;
