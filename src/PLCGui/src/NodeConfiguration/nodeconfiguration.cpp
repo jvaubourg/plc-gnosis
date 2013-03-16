@@ -109,7 +109,8 @@ void NodeConfiguration::saveAndClose(){
         if(outletImpedanceInput->isValid()){
             this->nodeModel->setHasOutlet(true);
             this->nodeModel->setOutletImpedance(outletImpedanceInput->getValue());
-            done(0);
+        }
+        else{
             return;
         }
     }
@@ -117,15 +118,25 @@ void NodeConfiguration::saveAndClose(){
         this->nodeModel->setHasOutlet(false);
     }
 
-    if(noiseSourceSettings->isChecked() && noiseSourceEditor->isValid()){
-        noiseSourceEditor->saveChanges();
+    if(noiseSourceSettings->isChecked()){
+        if(noiseSourceEditor->isValid()){
+            noiseSourceEditor->saveChanges();
+        }
+        else{
+            return;
+        }
     }
     else{
         nodeModel->setNoiseSource(0);
     }
 
-    if(netDeviceSettings->isChecked() && netDeviceEditor->isValid()){
-        netDeviceEditor->saveChanges();
+    if(netDeviceSettings->isChecked()){
+        if(netDeviceEditor->isValid()){
+            netDeviceEditor->saveChanges();
+        }
+        else{
+            return;
+        }
     }
     else{
         nodeModel->setNetDevice(0);

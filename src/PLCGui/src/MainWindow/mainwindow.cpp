@@ -11,7 +11,6 @@
 #include <QFileDialog>
 
 //TODO: All actions should connect to the editor.
-//TODO: Make sure all actions which work on a sheet don't die if we change the sheet!
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)

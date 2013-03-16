@@ -57,7 +57,7 @@ void PLCDataInputWidget::setValue(const QString& value){
 bool PLCDataInputWidget::isValid(){
     int i;
 
-    if(!checked){
+    if((!checked) && checkable){
         return true;
     }
 

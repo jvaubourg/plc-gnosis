@@ -174,6 +174,11 @@ QVariant PLCGraphicsNodeItem::itemChange(GraphicsItemChange change, const QVaria
 
 
     if(change == QGraphicsItem::ItemPositionHasChanged){
+
+        foreach(PLCGraphicsEdgeItem* edge, associatedEdges){
+            edge->updateGeometry();
+        }
+
         this->getNodeModel()->setPosition(value.toPointF());
     }
 
