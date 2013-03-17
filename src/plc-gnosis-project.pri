@@ -9,5 +9,6 @@ BIN_DIRECTORY = $$PWD/../bin
 SUBDIRS +=  PLCTopologyLoader \
             PLCGui \
             PLCSimulator \
+            Launcher
 
 CONFIG += ordered
