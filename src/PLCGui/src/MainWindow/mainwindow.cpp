@@ -90,7 +90,7 @@ void MainWindow::createActions(){
     connect(openAction, SIGNAL(triggered()), this, SLOT(loadSheet()));
 
     //ToolBar Actions
-    QIcon * selectionIcon = new QIcon("./icons/arrow.svg");
+    QIcon * selectionIcon = new QIcon(":/icons/arrow.svg");
     enableSelectorTool = new QAction(this);
     enableSelectorTool->setIcon(*selectionIcon);
     enableSelectorTool->setCheckable(true);
@@ -98,27 +98,27 @@ void MainWindow::createActions(){
     editActionGroup->addAction(enableSelectorTool);
     editTools->addAction(enableSelectorTool);
 
-    QIcon * componentIcon = new QIcon("./icons/node.svg");
+    QIcon * componentIcon = new QIcon(":/icons/node.svg");
     enableNodePlacementTool = new QAction(this);
     enableNodePlacementTool->setIcon(*componentIcon);
     enableNodePlacementTool->setCheckable(true);
     editActionGroup->addAction(enableNodePlacementTool);
     editTools->addAction(enableNodePlacementTool);
 
-    QIcon * lineIcon = new QIcon("./icons/edge.svg");
+    QIcon * lineIcon = new QIcon(":/icons/edge.svg");
     enableEdgeDrawingTool = new QAction(this);
     enableEdgeDrawingTool->setIcon(*lineIcon);
     enableEdgeDrawingTool->setCheckable(true);
     editActionGroup->addAction(enableEdgeDrawingTool);
     editTools->addAction(enableEdgeDrawingTool);
 
-    QIcon * simSettingsIcon = new QIcon("./icons/spectrum.svg");
+    QIcon * simSettingsIcon = new QIcon(":/icons/spectrum.svg");
     configureSpectrumAction = new QAction(this);
     configureSpectrumAction->setIcon(*simSettingsIcon);
     simulationTools->addAction(configureSpectrumAction);
 
     //Simulation 'Play' Action
-    QIcon * simulateIcon = new QIcon("./icons/play.svg");
+    QIcon * simulateIcon = new QIcon(":/icons/play.svg");
     runSimulationAction = new QAction(this);
     runSimulationAction->setIcon(*simulateIcon);
     simulationTools->addAction(runSimulationAction);

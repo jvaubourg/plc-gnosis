@@ -1,5 +1,5 @@
 TEMPLATE = lib
-CONFIG += dll
+CONFIG += dll plugin
 
 include(../plc-gnosis-common.pri)
 include(../plc-ns3-common.pri)

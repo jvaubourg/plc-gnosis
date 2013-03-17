@@ -50,14 +50,15 @@ SOURCES +=  src/main.cpp \
             src/NodeConfiguration/netdeviceeditor.cpp \
             src/NodeConfiguration/noisesourceeditor.cpp
 
+RESOURCES += \
+    res/resources.qrc
+
 
 
 
 #Setup destination for binaries and temp files
 DESTDIR =      $$BIN_DIRECTORY/app/
 
-
-QMAKE_EXT_OBJ = .myobj
 #Configuration specific settings
 CONFIG(debug, release|debug) {
     TARGET = ns-3gui-debug
