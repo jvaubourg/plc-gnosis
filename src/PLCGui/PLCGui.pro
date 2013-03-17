@@ -12,18 +12,6 @@ TEMPLATE = app
 win32: INCLUDEPATH += $$quote(../../lib)
 win32: LIBS += -L$$quote($$BIN_DIRECTORY/app)
 
-unix: {
-    LD_ENV_VAR = LD_LIBRARY_PATH
-}
-
-macx: {
-    LD_ENV_VAR = DYLD_LIBRARY_PATH
-}
-
-DEFINES += LD_ENV_VAR=\\\"$$LD_ENV_VAR\\\"
-DEFINES += PLC_DEFAULT_NS3_PATH=\\\"$$NS3_DIR\\\"
-
-
 #Source files
 HEADERS +=  src/MainWindow/mainwindow.h \
             src/DiagramSheet/diagramsheet.h \

@@ -1,6 +1,8 @@
 TEMPLATE = lib
 CONFIG += dll plugin
 
+LINK_NS3 = true
+
 include(../plc-gnosis-common.pri)
 include(../plc-ns3-common.pri)
 

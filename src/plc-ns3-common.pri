@@ -1,5 +1,16 @@
+unix: {
+    LD_ENV_VAR = LD_LIBRARY_PATH
+}
+
+macx: {
+    LD_ENV_VAR = DYLD_LIBRARY_PATH
+}
+
+DEFINES += LD_ENV_VAR=\\\"$$LD_ENV_VAR\\\"
+DEFINES += PLC_DEFAULT_NS3_PATH=\\\"$$NS3_DIR\\\"
+
 isEmpty( NS3_DIR ){
-    error( "ns3 build directory must be specified: i.e.: 'qmake ns-3gui.unix.pro NS3_DIR =/some/path/ns3.15/build")
+    error( "ns3 build directory must be specified: i.e.: 'qmake NS3_DIR=/some/path/ns3.15/build etc.'")
 }
 
 isEmpty( NS3_VERSION ){
@@ -8,40 +19,40 @@ isEmpty( NS3_VERSION ){
 }
 
 message( "Using ns3 version $$NS3_VERSION in $$NS3_DIR" )
-#######################################################################################
-
-NS3_LIB = -lns$$NS3_VERSION-
 
 
-#Configuration specific settings
-CONFIG(debug, release|debug) {
-    NS3_SUFFIX = -debug
-}
-else{
-    NS3_SUFFIX = -debug #Future -> Release build should link against optimized ns3 libs
-}
+#If the LINK_NS3 variable has been defined, setup for linking against ns3 libraries.
+count(LINK_NS3, 1){
+    message (" Linking vs NS3 Libraries ")
 
-NS3_MODULES +=  antenna \
-                mpi \
-                applications \
-                network \
-                bridge \
-                plc \
-                config-store \
-                propagation \
-                core \
-                spectrum \
-                csma \
-                stats \
-                internet \
-                tools \
-                mobility
+    NS3_LIB = -lns$$NS3_VERSION-
 
+    #Configuration specific settings
+    CONFIG(debug, release|debug) {
+        NS3_SUFFIX = -debug
+    }
+    else{
+        NS3_SUFFIX = -debug #Future -> Release build should link against optimized ns3 libs
+    }
 
-message($$NS3_MODULES)
+    NS3_MODULES +=  antenna \
+                    mpi \
+                    applications \
+                    network \
+                    bridge \
+                    plc \
+                    config-store \
+                    propagation \
+                    core \
+                    spectrum \
+                    csma \
+                    stats \
+                    internet \
+                    tools \
+                    mobility
 
-
-for(module, NS3_MODULES) {
-    NS3_LIBRARIES += $$join(module,, $$NS3_LIB, $$NS3_SUFFIX)
+    for(module, NS3_MODULES) {
+        NS3_LIBRARIES += $$join(module,, $$NS3_LIB, $$NS3_SUFFIX)
+    }
 }
 

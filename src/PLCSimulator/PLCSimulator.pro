@@ -1,4 +1,5 @@
 TEMPLATE = app
+LINK_NS3 = true
 
 include(../plc-gnosis-common.pri)
 include(../plc-ns3-common.pri)
@@ -22,7 +23,7 @@ INCLUDEPATH +=  $$NS3_DIR
 LIBS += -L$$NS3_DIR $$NS3_LIBRARIES
 
 LIBS += -L$$BIN_DIRECTORY/app
-LIBS  += -lplctopologyloader
+LIBS += -lplctopologyloader
 
 #Source files
 HEADERS +=  src/Simulator/simulator.h \
