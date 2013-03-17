@@ -21,6 +21,8 @@ macx: {
 }
 
 DEFINES += LD_ENV_VAR=\\\"$$LD_ENV_VAR\\\"
+DEFINES += PLC_DEFAULT_NS3_PATH=\\\"$$NS3_DIR\\\"
+
 
 #Source files
 HEADERS +=  src/MainWindow/mainwindow.h \
@@ -52,8 +54,6 @@ SOURCES +=  src/main.cpp \
 
 RESOURCES += \
     res/resources.qrc
-
-
 
 
 #Setup destination for binaries and temp files
