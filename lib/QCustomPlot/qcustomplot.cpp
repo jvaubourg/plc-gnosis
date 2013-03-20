@@ -2353,6 +2353,11 @@ QCPRange QCPGraph::getValueRange(bool &validRange, SignDomain inSignDomain, bool
       ++it;
     }
   }
+
+  if(range.lower == range.upper){
+      range.lower -= 0.5;
+      range.upper += 0.5;
+  }
   
   validRange = haveLower && haveUpper;
   return range;
@@ -9823,6 +9828,11 @@ QCPRange QCPCurve::getValueRange(bool &validRange, SignDomain inSignDomain) cons
     }
     ++it;
   }
+
+  if(range.lower == range.upper){
+      range.lower -= 0.5;
+      range.upper += 0.5;
+  }
   
   validRange = haveLower && haveUpper;
   return range;
@@ -10335,6 +10345,11 @@ QCPRange QCPBars::getValueRange(bool &validRange, SignDomain inSignDomain) const
     ++it;
   }
   
+  if(range.lower == range.upper){
+      range.lower -= 0.5;
+      range.upper += 0.5;
+  }
+
   validRange = range.lower < range.upper;
   return range;
 }

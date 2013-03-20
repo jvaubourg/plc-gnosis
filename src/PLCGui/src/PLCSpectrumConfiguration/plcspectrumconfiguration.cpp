@@ -66,7 +66,7 @@ PLCSpectrumConfiguration::PLCSpectrumConfiguration(PLCSpectrumModel* spectrumMod
 
     timeSettingsLayout->addWidget(new QLabel("Main Frequency:"), 0, 0);
     timeSettingsLayout->addWidget(new QLabel("Samples per Cycle:"), 1, 0);
-    timeSettingsLayout->addWidget(new QLabel("Simulation end time:"), 2, 0);
+    timeSettingsLayout->addWidget(new QLabel("Symbol Length:"), 2, 0);
 
     mainsFreqBox = new QSpinBox();
     samplesPerCycleBox = new QSpinBox();
@@ -78,11 +78,11 @@ PLCSpectrumConfiguration::PLCSpectrumConfiguration(PLCSpectrumModel* spectrumMod
 
     mainsFreqBox->setSuffix(" Hz");
     samplesPerCycleBox->setSuffix("");
-    simulationTimeBox->setSuffix(" s");
+    simulationTimeBox->setSuffix(" us");
 
     mainsFreqBox->setValue(spectrum->getMainsFrequency());
     samplesPerCycleBox->setValue(spectrum->getSamplesPerCycle());
-    simulationTimeBox->setValue(spectrum->getSimulationLength());
+    simulationTimeBox->setValue(spectrum->getSymbolLength());
 
     timeSettingsLayout->addWidget(mainsFreqBox, 0, 1);
     timeSettingsLayout->addWidget(samplesPerCycleBox, 1, 1);
@@ -116,7 +116,7 @@ void PLCSpectrumConfiguration::saveValues(void)
     spectrum->setUpperBandLimit(spectrum->getLowerBandLimit() + (spectrum->getBandResolution() * freqNumBandsBox->value()));
 
     spectrum->setMainsFrequency(mainsFreqBox->value());
-    spectrum->setSimulationLength(simulationTimeBox->value());
+    spectrum->setSymbolLength(simulationTimeBox->value());
 
     spectrum->setSamplesPerCycle(samplesPerCycleBox->value());
 

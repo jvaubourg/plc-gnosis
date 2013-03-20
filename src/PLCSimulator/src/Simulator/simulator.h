@@ -11,7 +11,9 @@
 #include <ns3/plc.h>
 
 #include "../BodeWidget/bodewidget.h"
-#include "../SimulatorMainWindow/simulatormainwindow.h"
+
+#include "../SimulatorMainWindow/bodewidgetwindow.h"
+#include "../GraphWidget/graphwidget.h"
 
 class PLCSimulator
 {
@@ -19,19 +21,28 @@ public:
     PLCSimulator();
     PLCSimulator(QString modelFileName);
     void collectTransferFunctions();
-    void showMainWindow();
+    void showPlotWindow();
+    void showBodeWindow();
     int numberOfPlots();
 
+    void psdTest();
+
     static void exportTransferData(QString fileName, Ptr<PLC_TransferBase> ctf);
+    void simulateSINRAtReceiver(QString rxName, QString txName, int packetLength);
 
     //void showTransferFunction(QString from, QString to);
 
     static QVector<QVector<double> > ctfToPlottable(Ptr<PLC_TransferVector> ctf);
+    static QVector<QVector<double> > spectrumValueToPlottable(Ptr<SpectrumValue> val);
 private:
     void setupWidgets();
 
     PLCTopologyLoader * loader;
-    SimulatorMainWindow* mainWindow;
+    BodeWidgetWindow* bodeWindow;
+
+    GraphWidget * graphWidget;
+
+    QMap<QString, QMap<QString,Ptr<PLC_TransferBase> > > transferFunctions;
 };
 
 #endif // PLC_GUIHELPER_H

@@ -8,7 +8,7 @@ PLCSpectrumModel::PLCSpectrumModel()
 
     this->mainsFrequency = 50;
     this->samplesPerCycle = 50;
-    this->simulationLength = 1.0;
+    this->symbolLength = 750.0;
 
     this->noiseFloor = 1e-7;
 }
@@ -26,7 +26,7 @@ QVariantMap PLCSpectrumModel::toVariantMap(){
 
     map["MainsFrequency"] = mainsFrequency;
     map["SamplesPerCycle"] = samplesPerCycle;
-    map["SimulationLength"] = simulationLength;
+    map["SymbolLength"] = symbolLength;
 
     map["NoiseFloor"] = noiseFloor;
 
@@ -39,7 +39,12 @@ void PLCSpectrumModel::fromVariantMap(const QVariantMap& map){
     bandResolution = map["BandResolution"].toDouble();
 
     samplesPerCycle = map["SamplesPerCycle"].toInt();
-    simulationLength = map["SimulationLength"].toInt();
+
+    if(!map.contains("SymbolLength")){
+        symbolLength = 750;
+    }
+
+    symbolLength = map["SymbolLength"].toInt();
     mainsFrequency = map["MainsFrequency"].toInt();
 
     noiseFloor = map["NoiseFloor"].toDouble();

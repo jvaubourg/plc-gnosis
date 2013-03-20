@@ -19,7 +19,7 @@ else {
     MOC_DIR =       $$BIN_DIRECTORY/tmp/moc/release
 }
 
-INCLUDEPATH +=  $$NS3_DIR
+
 LIBS += -L$$NS3_DIR $$NS3_LIBRARIES
 
 LIBS += -L$$BIN_DIRECTORY/app
@@ -29,10 +29,14 @@ LIBS += -lplctopologyloader
 HEADERS +=  src/Simulator/simulator.h \
             ../../lib/QCustomPlot/qcustomplot.h \
             src/BodeWidget/bodewidget.h \
-            src/SimulatorMainWindow/simulatormainwindow.h
+            src/SimulatorMainWindow/simulatormainwindow.h \
+    src/GraphWidget/graphwidget.h \
+    src/SimulatorMainWindow/bodewidgetwindow.h
 
 SOURCES +=  src/Simulator/simulator.cpp \
             src/Simulator/simulatorMain.cpp \
             ../../lib/QCustomPlot/qcustomplot.cpp \
             src/BodeWidget/bodewidget.cpp \
-            src/SimulatorMainWindow/simulatormainwindow.cpp
+            src/SimulatorMainWindow/simulatormainwindow.cpp \
+    src/GraphWidget/graphwidget.cpp \
+    src/SimulatorMainWindow/bodewidgetwindow.cpp

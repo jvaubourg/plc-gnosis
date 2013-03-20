@@ -25,6 +25,8 @@ message( "Using ns3 version $$NS3_VERSION in $$NS3_DIR" )
 count(LINK_NS3, 1){
     message (" Linking vs NS3 Libraries ")
 
+    INCLUDEPATH +=  $$NS3_DIR
+
     NS3_LIB = -lns$$NS3_VERSION-
 
     #Configuration specific settings

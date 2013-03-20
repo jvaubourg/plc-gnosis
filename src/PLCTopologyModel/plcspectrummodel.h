@@ -17,7 +17,7 @@ public:
     double getBandResolution(){ return bandResolution; }
 
     int    getMainsFrequency(){ return mainsFrequency; }
-    int    getSimulationLength(){ return simulationLength; }
+    int    getSymbolLength(){ return symbolLength; }
     int    getSamplesPerCycle(){ return samplesPerCycle; }
 
     double getNoiseFloor(){ return noiseFloor; }
@@ -27,7 +27,7 @@ public:
     void setBandResolution(double resolution) {bandResolution = resolution; }
 
     void setMainsFrequency(int frequency) {mainsFrequency = frequency;}
-    void setSimulationLength(int length)  {simulationLength = length;}
+    void setSymbolLength(int length)  {symbolLength = length;}
     void setSamplesPerCycle(int resolution) {samplesPerCycle = resolution;}
 
     void setNoiseFloor(double floor) { noiseFloor = floor;}
@@ -39,7 +39,7 @@ private:
 
     int mainsFrequency;
     int samplesPerCycle;
-    int simulationLength;
+    int symbolLength;
 
     double noiseFloor;
 };

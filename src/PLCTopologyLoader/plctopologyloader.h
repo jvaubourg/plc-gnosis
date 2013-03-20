@@ -35,13 +35,15 @@ public:
 
     static Ptr<PLC_Node>        fromNodeModel(NodeModel* node, Ptr<const SpectrumModel> spectrumModel);
     static Ptr<PLC_Edge>        fromEdgeModel(EdgeModel* edge, Ptr<const SpectrumModel> spectrumModel);
-    static Ptr<PLC_NetDevice>   fromNetDeviceModel(NetDeviceModel* netDevice, Ptr<const SpectrumModel> spectrumModel, Ptr<PLC_Node> sourceNode);
+    static Ptr<PLC_NetDevice>   fromNetDeviceModel(NetDeviceModel* netDevice, Ptr<const SpectrumModel> spectrumModel, Ptr<PLC_Node> sourceNode, Mac48Address addr);
     static Ptr<PLC_NoiseSource> fromNoiseSourceModel(NoiseSourceModel* noiseSource, Ptr<const SpectrumModel> spectrumModel, Ptr<PLC_Node> sourceNode);
 
     static Ptr<PLC_ValueBase>   infinity(Ptr<const SpectrumModel> spectrumModel);
     static Ptr<PLC_ValueBase>   valueFromFile(const QString& file, Ptr<const SpectrumModel> spectrumModel);
     static Ptr<PLC_ConstValue>  constFromValueString(PLCValueString value, Ptr<const SpectrumModel> spectrumModel);
     static Ptr<PLC_ValueBase>   fromValueString(PLCValueString value, Ptr<const SpectrumModel> spectrumModel);
+
+    static void incrementMacAddress(Mac48Address *addr);
 
     Ptr<PLC_Channel> getChannel(){return channel;}
     PLC_NetdeviceList getNetDevices(){return netDevices;}
@@ -57,6 +59,9 @@ public:
 
     Ptr<SpectrumModel> getSpectrumModel(){ return spectrumModel;}
 
+    Ptr<PLC_NetDevice> getTransmitterByName(QString name){ return transmitters.at(transmitterNameToIndexMap.value(name)); }
+    Ptr<PLC_NetDevice> getReceiverByName(QString name){ return receivers.at(receiverNameToIndexMap.value(name)); }
+
 private:
 
     Ptr<SpectrumModel> spectrumModel;
@@ -71,9 +76,11 @@ private:
 
     PLC_NetdeviceList transmitters;
     QStringList transmitterNames;
+    QMap<QString, int> transmitterNameToIndexMap;
 
     PLC_NetdeviceList receivers;
     QStringList receiverNames;
+    QMap<QString, int> receiverNameToIndexMap;
 
     QList< Ptr<PLC_Edge> > edges;
 

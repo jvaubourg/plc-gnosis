@@ -5,19 +5,18 @@ int main(int argc, char* argv[]){
 
     QApplication app(argc, argv);
 
-    PLCSimulator simulator;
-    //PLCSimulator simulator("./diagrams/ScenarioB.dgm");
-    simulator.collectTransferFunctions();
 
-    if(simulator.numberOfPlots() > 0){
-        simulator.showMainWindow();
-        app.exec();
-    }
-    else {
-        qDebug() << "No plottable transfer functions. See the /data/ directory for exported files";
-    }
+    //PLCSimulator simulator;
+    PLCSimulator simulator("./diagrams/ScenarioB.dgm");
+    //simulator.collectTransferFunctions();
+    //simulator.simulateSINRAtReceiver("N1", "N2", 100000);
 
-    qDebug() << "Simulator process finished";
+    simulator.psdTest();
 
+    simulator.showBodeWindow();
+    simulator.showPlotWindow();
+
+    qDebug() << "Simulator process finished. Showing Plots.";
+    app.exec();
     return 0;
 }

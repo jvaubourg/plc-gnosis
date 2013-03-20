@@ -78,6 +78,35 @@ void PLCSimulator::exportTransferData(QString fileName, Ptr<PLC_TransferBase> ct
     file.close();
 }
 
+QVector<QVector<double> > PLCSimulator::spectrumValueToPlottable(Ptr<SpectrumValue> val){
+
+    QVector<QVector<double> > ret;
+    QVector<double> xVals;
+    QVector<double> yVals;
+
+    Bands::const_iterator it = val->ConstBandsBegin();
+    Values::const_iterator v_it = val->ConstValuesBegin();
+
+    for(; it != val->ConstBandsEnd(); it++){
+        xVals.push_back(it->fc/1.0e6);
+
+        double mag = std::abs(*v_it);
+
+        if(mag != 0){
+            yVals.push_back(20.0*std::log10(mag));
+        } else {
+            xVals.pop_back();
+        }
+
+        v_it++;
+    }
+
+    ret.push_back(xVals);
+    ret.push_back(yVals);
+
+    return ret;
+}
+
 QVector<QVector<double> > PLCSimulator::ctfToPlottable(Ptr<PLC_TransferVector> ctf){
     QVector<double> xValues;
     QVector<double> abs;
@@ -155,24 +184,35 @@ PLCSimulator::PLCSimulator(QString modelFileName){
 }
 
 void PLCSimulator::setupWidgets(){
-    mainWindow = new SimulatorMainWindow();
+    bodeWindow = new BodeWidgetWindow();
 
-    mainWindow->setWindowTitle("Channel Transfer Functions");
-    mainWindow->resize(600, 400);
+    bodeWindow->setWindowTitle("Channel Transfer Functions");
+    bodeWindow->resize(600, 400);
 
-
+    graphWidget = new GraphWidget();
+    graphWidget->setWindowTitle("SINR/RxPSD And stuff");
+    graphWidget->resize(600, 400);
 }
 
-void PLCSimulator::showMainWindow(){
-    mainWindow->getPlot()->replot();
-    mainWindow->show();
+
+void PLCSimulator::showBodeWindow(){
+    bodeWindow->getPlot()->replot();
+    bodeWindow->show();
+}
+
+void PLCSimulator::showPlotWindow(){
+    graphWidget->getPlot()->rescaleAxes();
+    graphWidget->getPlot()->replot();
+    graphWidget->show();
 }
 
 int PLCSimulator::numberOfPlots(){
-    return mainWindow->getPlot()->getNumberPlots();
+    return bodeWindow->getPlot()->getNumberPlots();
 }
 
 void PLCSimulator::collectTransferFunctions(){
+
+    transferFunctions.clear();
     //LogComponentEnable("PLC_Channel", LOG_LEVEL_FUNCTION);
     //LogComponentEnable("PLC_Edge", LOG_LEVEL_FUNCTION);
     //LogComponentEnable("PLC_Node", LOG_LEVEL_FUNCTION);
@@ -194,19 +234,24 @@ void PLCSimulator::collectTransferFunctions(){
     PLC_NetdeviceList transmitterDevices = loader->getTransmitters();
     QStringList transmitterNames = loader->getTransmitterNames();
 
+    Ptr<PLC_HalfDuplexOfdmPhy> txPhy;
+    Ptr<PLC_HalfDuplexOfdmPhy> rxPhy;
 
     Ptr<PLC_TxInterface> txIf;
     Ptr<PLC_RxInterface> rxIf;
 
-    BodeWidget * const bodePlot = mainWindow->getPlot();
+    BodeWidget * const bodePlot = bodeWindow->getPlot();
 
     for(unsigned int i = 0; i < transmitterDevices.size(); i++){
 
         for(unsigned int j = 0; j< receiverDevices.size(); j++){
             if(transmitterDevices.at(i) != receiverDevices.at(j)){
 
-                txIf = transmitterDevices.at(i)->GetHalfDuplexPhy()->GetTxInterface();
-                rxIf = receiverDevices.at(j)->GetHalfDuplexPhy()->GetRxInterface();
+                txPhy = transmitterDevices.at(i)->GetHalfDuplexPhy();
+                txIf = txPhy->GetTxInterface();
+
+                rxPhy = receiverDevices.at(j)->GetHalfDuplexPhy();
+                rxIf = rxPhy->GetRxInterface();
 
                 transmitterDevices.at(i)->GetChannelTransferImpl((receiverDevices.at(j)))->CalculateChannelTransferVector();
 
@@ -214,6 +259,8 @@ void PLCSimulator::collectTransferFunctions(){
                 NS_ABORT_MSG_IF(chImpl == NULL, "no channel from rxDev to txDev");
 
                 Ptr<PLC_TransferBase> chTransFunc = chImpl->GetChannelTransferVector();
+
+                transferFunctions[transmitterNames.at(i)][receiverNames.at(j)] = chTransFunc;
 
                 QString name;
                 name += transmitterNames.at(i) + "-to-" + receiverNames.at(j);
@@ -241,6 +288,111 @@ void PLCSimulator::collectTransferFunctions(){
 
     qDebug() << "Diagram has" << transmitterDevices.size() << "Tx device(s) and" << receiverDevices.size() << "Rx device(s)";
     qDebug() << "Finished collecting all channel transfer functions!";
+}
 
+void PLCSimulator::simulateSINRAtReceiver(QString rxName, QString txName, int packetLength){
+
+    //LogComponentEnable("PLC_Channel", LOG_LEVEL_FUNCTION);
+    //LogComponentEnable("PLC_Edge", LOG_LEVEL_FUNCTION);
+    //LogComponentEnable("PLC_Node", LOG_LEVEL_FUNCTION);
+    //LogComponentEnable("PLC_Mac", LOG_LEVEL_FUNCTION);
+    //LogComponentEnable("PLC_Mac", LOG_LEVEL_LOGIC);
+    //LogComponentEnable("PLC_Phy", LOG_LEVEL_FUNCTION);
+    //LogComponentEnable("PLC_SimulatorImpl", LOG_LEVEL_FUNCTION);
+
+    Ptr<PLC_NetDevice> txDev = loader->getTransmitterByName(txName);
+    Ptr<PLC_NetDevice> rxDev = loader->getReceiverByName(rxName);
+
+    Ptr<PLC_HalfDuplexOfdmPhy> txPhy = txDev->GetHalfDuplexPhy();
+    Ptr<PLC_HalfDuplexOfdmPhy> rxPhy = rxDev->GetHalfDuplexPhy();
+
+    Ptr<PLC_TxInterface> txIf = txPhy->GetTxInterface();
+    Ptr<PLC_RxInterface> rxIf = rxPhy->GetRxInterface();
+
+
+    // The receive power spectral density computation is done by the channel
+    // transfer implementation from TX interface to RX interface
+    Ptr<PLC_ChannelTransferImpl> chImpl = txIf->GetChannelTransferImpl(PeekPointer(rxIf));
+    assert(chImpl);
+
+    Ptr<SpectrumValue> rxPSD = chImpl->CalculateRxPowerSpectralDensity(txPhy->GetTxPowerSpectralDensity());
+
+    // SINR is calculated by PLC_Interference (member of PLC_Phy)
+    PLC_Interference interference;
+    Ptr<SpectrumValue> noiseFloor = CreateWorstCaseBgNoise(txDev->GetSpectrumModel())->GetNoisePsd();
+    interference.SetNoiseFloor(noiseFloor);
+    interference.StartRx(rxPSD);
+
+
+    Ptr<SpectrumValue> txPsd = Create<SpectrumValue> (txDev->GetSpectrumModel());
+    (*txPsd) = 1e-7; // -40dBm
+
+    Ptr<SpectrumValue> sinr = interference.GetSINR();
+
+    graphWidget->addPlot(PLCSimulator::spectrumValueToPlottable(txPsd), rxName + QString(" rxPSD"));
+    //graphWidget->addPlot(PLCSimulator::spectrumValueToPlottable(sinr), txName + QString(" SINR"));
+
+    qDebug() << "Finished.....?";
+}
+
+
+void PLCSimulator::psdTest(){
+    // Define spectrum model
+    PLC_SpectrumModelHelper smHelper;
+    Ptr<const SpectrumModel> sm;
+    sm = smHelper.GetSpectrumModel(0, 10e6, 100);
+
+    // Create cable types
+    Ptr<PLC_Cable> cable = CreateObject<PLC_NAYY150SE_Cable> (sm);
+
+    // Create nodes
+    Ptr<PLC_Node> n1 = CreateObject<PLC_Node> ();
+    Ptr<PLC_Node> n2 = CreateObject<PLC_Node> ();
+    n1->SetPosition(0,0,0);
+    n2->SetPosition(1000,0,0);
+
+    PLC_NodeList nodes;
+    nodes.push_back(n1);
+    nodes.push_back(n2);
+
+    // Link nodes
+    CreateObject<PLC_Line> (cable, n1, n2);
+
+    // Set up channel
+    PLC_ChannelHelper channelHelper(sm);
+    channelHelper.Install(nodes);
+    Ptr<PLC_Channel> channel = channelHelper.GetChannel();
+
+    // Create interfaces (usually done by the device helper)
+    Ptr<PLC_TxInterface> txIf = CreateObject<PLC_TxInterface> (n1, sm);
+    Ptr<PLC_RxInterface> rxIf = CreateObject<PLC_RxInterface> (n2, sm);
+
+    // Add interfaces to the channel (usually done by the device helper)
+    channel->AddTxInterface(txIf);
+    channel->AddRxInterface(rxIf);
+
+    // Since we do not run an ns-3 simulation, the channel computation has to be triggered manually
+    channel->InitTransmissionChannels();
+    channel->CalcTransmissionChannels();
+
+    // Define transmit power spectral density
+    Ptr<SpectrumValue> txPsd = Create<SpectrumValue> (sm);
+    (*txPsd) = 1e-8; // -50dBm/Hz
+
+    // The receive power spectral density computation is done by the channel
+    // transfer implementation from TX interface to RX interface
+    Ptr<PLC_ChannelTransferImpl> chImpl = txIf->GetChannelTransferImpl(PeekPointer(rxIf));
+    NS_ASSERT(chImpl);
+    Ptr<SpectrumValue> rxPsd = chImpl->CalculateRxPowerSpectralDensity(txPsd);
+
+    // SINR is calculated by PLC_Interference (member of PLC_Phy)
+    PLC_Interference interference;
+    Ptr<SpectrumValue> noiseFloor = CreateWorstCaseBgNoise(sm)->GetNoisePsd();
+    interference.SetNoiseFloor(noiseFloor);
+    interference.StartRx(rxPsd);
+
+    Ptr<SpectrumValue> sinr = interference.GetSINR();
+
+    graphWidget->addPlot(PLCSimulator::spectrumValueToPlottable(txPsd), QString(" rxPSD"));
 
 }

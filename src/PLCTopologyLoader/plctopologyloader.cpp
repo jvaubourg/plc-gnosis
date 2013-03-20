@@ -7,6 +7,32 @@
 
 #include "ns3/plc-spectrum-helper.h"
 #include "ns3/object-factory.h"
+#include "ns3/plc-device-helper.h"
+
+void
+PLCTopologyLoader::incrementMacAddress(Mac48Address *addr)
+{
+    uint8_t buf[6];
+    addr->CopyTo(buf);
+
+    uint64_t address = 	(((uint64_t) buf[0] << 40) & 0xff0000000000) |
+                        (((uint64_t) buf[1] << 32) & 0x00ff00000000) |
+                        (((uint64_t) buf[2] << 24) & 0x0000ff000000) |
+                        (((uint64_t) buf[3] << 16) & 0x000000ff0000) |
+                        (((uint64_t) buf[4] << 8)  & 0x00000000ff00) |
+                        (((uint64_t) buf[5] << 0)  & 0x0000000000ff);
+
+    ++address;
+
+    buf[0] = (address >> 40) & 0xff;
+    buf[1] = (address >> 32) & 0xff;
+    buf[2] = (address >> 24) & 0xff;
+    buf[3] = (address >> 16) & 0xff;
+    buf[4] = (address >> 8) & 0xff;
+    buf[5] = (address >> 0) & 0xff;
+
+    addr->CopyFrom(buf);
+}
 
 PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
 
@@ -21,7 +47,7 @@ PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
 
     PLC_Time::SetTimeModel(topologyModel.getSpectrumModel().getMainsFrequency(),
                            topologyModel.getSpectrumModel().getSamplesPerCycle(),
-                           Seconds(topologyModel.getSpectrumModel().getSimulationLength()));
+                           MicroSeconds(topologyModel.getSpectrumModel().getSymbolLength()));
 
     plcGraph = Create<PLC_Graph>();
 
@@ -32,6 +58,7 @@ PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
     QList<NodeModel*>* topologyNodes = topologyModel.getNodes();
     QList<EdgeModel*>* topologyEdges = topologyModel.getEdges();
 
+    Mac48Address addr("00:00:00:00:00:00");
 
     //Loop through the nodes, and create as necessary.
     for(int i = 0; i < topologyNodes->length(); i++){
@@ -45,18 +72,22 @@ PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
         //Loop through nodes net devices and create as necessary
         if(currentNode->getNetDevice() != 0)
         {
-            Ptr<PLC_NetDevice> newNetDevice = fromNetDeviceModel(currentNode->getNetDevice(), sm, newNode);
+            Ptr<PLC_NetDevice> newNetDevice = fromNetDeviceModel(currentNode->getNetDevice(), sm, newNode, addr);
+            PLCTopologyLoader::incrementMacAddress(&addr);
+
             QString netDeviceName = currentNode->getNetDevice()->getName();
 
             this->netDevices.push_back(newNetDevice);
             this->netDeviceNames.push_back(netDeviceName);
 
             if(currentNode->getNetDevice()->receiverEnabled()){
+                this->receiverNameToIndexMap[netDeviceName] = receivers.size();
                 this->receivers.push_back(newNetDevice);
                 this->receiverNames.push_back(netDeviceName);
             }
 
             if(currentNode->getNetDevice()->transmitterEnabled()){
+                this->transmitterNameToIndexMap[netDeviceName] = transmitters.size();
                 this->transmitters.push_back(newNetDevice);
                 this->transmitterNames.push_back(netDeviceName);
             }
@@ -85,8 +116,9 @@ PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
         Ptr<PLC_Node> toNode = nodesByName[currentEdge->getToNode()];
 
         //Fake the node positions to avoid the user having to accurately depict the topology... (Hopefully this works!)
-        toNode->SetPosition(currentEdge->getLength(), 0, 0);
-
+        toNode->SetPosition( fromNode->GetPosition().x + currentEdge->getLength(), 0, 0);
+\
+        qDebug() << "Set Pos: " << fromNode->GetPosition().x + currentEdge->getLength();
         if(currentEdge->isCableModel()){
             edgeFactory.SetTypeId(currentEdge->getCableType().toStdString());
             Ptr<PLC_Cable> cable = edgeFactory.Create()->GetObject<PLC_Cable>();
@@ -106,8 +138,15 @@ PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
 
         //Reset the 'to' nodes original position.
         edges.push_back(newEdge);
-        toNode->SetPosition(0, 0, 0);
+        //toNode->SetPosition(0, 0, 0);
+
+
     }
+
+    channel->InitTransmissionChannels();
+    channel->CalcTransmissionChannels();
+
+    //qDebug() << plcGraph->GetDistance(transmitters.at(0)->GetPlcNode(), receivers.at(0)->GetPlcNode());
 
     //And.... that should be everything...
 }
@@ -228,12 +267,12 @@ Ptr<PLC_NoiseSource> PLCTopologyLoader::fromNoiseSourceModel(NoiseSourceModel *n
     return newNoiseSource;
 }
 
-Ptr<PLC_NetDevice> PLCTopologyLoader::fromNetDeviceModel(NetDeviceModel *netDevice, Ptr<const SpectrumModel> spectrumModel, Ptr<PLC_Node> sourceNode){
+Ptr<PLC_NetDevice> PLCTopologyLoader::fromNetDeviceModel(NetDeviceModel *netDevice, Ptr<const SpectrumModel> spectrumModel, Ptr<PLC_Node> sourceNode, 	Mac48Address addr){
 
     ObjectFactory netDeviceFactory;
     netDeviceFactory.SetTypeId(PLC_SimpleNetDevice::GetTypeId());
 
-    Ptr<PLC_NetDevice> newNetDevice = netDeviceFactory.Create<PLC_NetDevice>(); //TODO: More than just the simple net device type?
+    Ptr<PLC_SimpleNetDevice> newNetDevice = netDeviceFactory.Create<PLC_SimpleNetDevice>(); //TODO: More than just the simple net device type?
 
     ObjectFactory errorModelFactory;
     errorModelFactory.SetTypeId(PLC_ChannelCapacityErrorModel::GetTypeId());
@@ -246,6 +285,10 @@ Ptr<PLC_NetDevice> PLCTopologyLoader::fromNetDeviceModel(NetDeviceModel *netDevi
     newNetDevice->SetNoiseFloor(CreateBestCaseBgNoise(spectrumModel)->GetNoisePsd());
     newNetDevice->SetErrorModel(errorModelFactory.Create<PLC_ErrorModel>());
     newNetDevice->SetTxPowerSpectralDensity(txPsd);
+
+    newNetDevice->SetMac(CreateObject<PLC_ArqMac>());
+    newNetDevice->SetAddress(addr);
+
 
 
     /*This stuff actually included from the diagram*/
@@ -274,7 +317,7 @@ Ptr<PLC_NetDevice> PLCTopologyLoader::fromNetDeviceModel(NetDeviceModel *netDevi
 Ptr<PLC_Node> PLCTopologyLoader::fromNodeModel(NodeModel *node, Ptr<const SpectrumModel> spectrumModel){
     Ptr<PLC_Node> newNode = Create<PLC_Node>();
 
-
+    newNode->SetName(node->getName().toStdString());
     //Creating outlet might need to be done last or else net devices will overwrite it??
     if(node->getHasOutlet()){
         Ptr<PLC_Outlet> newOutlet = Create<PLC_Outlet>(newNode, fromValueString(node->getOutletImpedance(), spectrumModel));
