@@ -5,13 +5,13 @@ int main(int argc, char* argv[]){
 
     QApplication app(argc, argv);
 
+    PLCSimulator simulator;
+    //PLCSimulator simulator("./diagrams/ScenarioB.dgm");
 
-    //PLCSimulator simulator;
-    PLCSimulator simulator("./diagrams/ScenarioB.dgm");
-    //simulator.collectTransferFunctions();
-    //simulator.simulateSINRAtReceiver("N1", "N2", 100000);
+    simulator.collectTransferFunctions();
+    simulator.simulateSINRAtReceiver("N1", "N2", 100000);
 
-    simulator.psdTest();
+    //simulator.psdTest();
 
     simulator.showBodeWindow();
     simulator.showPlotWindow();

@@ -24,7 +24,7 @@ HEADERS +=  src/MainWindow/mainwindow.h \
             src/PLCSpectrumConfiguration/plcspectrumconfiguration.h \
             src/NodeConfiguration/netdeviceeditor.h \
             src/NodeConfiguration/noisesourceeditor.h \
-            src/ZoomSlider/zoomslider.h
+            src/ZoomSlider/zoomslider.h \
 
 SOURCES +=  src/main.cpp \
             src/MainWindow/mainwindow.cpp \
@@ -38,7 +38,7 @@ SOURCES +=  src/main.cpp \
             src/PLCSpectrumConfiguration/plcspectrumconfiguration.cpp \
             src/ZoomSlider/zoomslider.cpp \
             src/NodeConfiguration/netdeviceeditor.cpp \
-            src/NodeConfiguration/noisesourceeditor.cpp
+            src/NodeConfiguration/noisesourceeditor.cpp \
 
 RESOURCES += \
     res/resources.qrc
