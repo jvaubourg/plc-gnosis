@@ -41,7 +41,6 @@ BodeWidget::BodeWidget(QWidget *parent) :
     connect(dbPlot, SIGNAL(selectionChangedByUser()), this, SLOT(selectionChanged()));
 }
 
-
 void BodeWidget::addBodePlot(BodeData *data, const QString& name){
     QCPGraph* dbGraph = dbPlot->addGraph();
     QCPGraph* paGraph = paPlot->addGraph();

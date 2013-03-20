@@ -118,7 +118,7 @@ PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
         //Fake the node positions to avoid the user having to accurately depict the topology... (Hopefully this works!)
         toNode->SetPosition( fromNode->GetPosition().x + currentEdge->getLength(), 0, 0);
 \
-        qDebug() << "Set Pos: " << fromNode->GetPosition().x + currentEdge->getLength();
+        //qDebug() << "Set Pos: " << fromNode->GetPosition().x + currentEdge->getLength();
         if(currentEdge->isCableModel()){
             edgeFactory.SetTypeId(currentEdge->getCableType().toStdString());
             Ptr<PLC_Cable> cable = edgeFactory.Create()->GetObject<PLC_Cable>();

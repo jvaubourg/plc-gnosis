@@ -31,7 +31,8 @@ HEADERS +=  src/Simulator/simulator.h \
             src/BodeWidget/bodewidget.h \
             src/SimulatorMainWindow/simulatormainwindow.h \
     src/GraphWidget/graphwidget.h \
-    src/SimulatorMainWindow/bodewidgetwindow.h
+    src/SimulatorMainWindow/bodewidgetwindow.h \
+    src/PLCSimulatorSettingsWidget/plcsimulatorsettingswidget.h
 
 SOURCES +=  src/Simulator/simulator.cpp \
             src/Simulator/simulatorMain.cpp \
@@ -39,4 +40,5 @@ SOURCES +=  src/Simulator/simulator.cpp \
             src/BodeWidget/bodewidget.cpp \
             src/SimulatorMainWindow/simulatormainwindow.cpp \
     src/GraphWidget/graphwidget.cpp \
-    src/SimulatorMainWindow/bodewidgetwindow.cpp
+    src/SimulatorMainWindow/bodewidgetwindow.cpp \
+    src/PLCSimulatorSettingsWidget/plcsimulatorsettingswidget.cpp

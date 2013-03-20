@@ -1,6 +1,7 @@
 #ifndef PLC_GUIHELPER_H
 #define PLC_GUIHELPER_H
 
+#include <QObject>
 #include <QMap>
 
 //TODO Rename stuff in this class so it's consistent
@@ -15,32 +16,41 @@
 #include "../SimulatorMainWindow/bodewidgetwindow.h"
 #include "../GraphWidget/graphwidget.h"
 
-class PLCSimulator
+class PLCSimulator : public QObject
 {
+    Q_OBJECT
+
 public:
     PLCSimulator();
     PLCSimulator(QString modelFileName);
     void collectTransferFunctions();
-    void showPlotWindow();
+    void showPsdPlotWindow();
+    void showSinrPlotWindow();
     void showBodeWindow();
     int numberOfPlots();
 
     void psdTest();
 
-    static void exportTransferData(QString fileName, Ptr<PLC_TransferBase> ctf);
-    void simulateSINRAtReceiver(QString rxName, QString txName, int packetLength);
+    PLCTopologyLoader* getLoader(){return loader;}
 
-    //void showTransferFunction(QString from, QString to);
+    static void exportTransferData(QString fileName, Ptr<PLC_TransferBase> ctf);
+
 
     static QVector<QVector<double> > ctfToPlottable(Ptr<PLC_TransferVector> ctf);
     static QVector<QVector<double> > spectrumValueToPlottable(Ptr<SpectrumValue> val);
+
+public slots:
+    void collectTransferFunctions(QStringList enTxNodes, QStringList enRxNodes);
+    void simulateSINRAtReceiver(bool doPSD, bool doSINR, QString txName, QString rxName);
+
 private:
     void setupWidgets();
 
     PLCTopologyLoader * loader;
     BodeWidgetWindow* bodeWindow;
 
-    GraphWidget * graphWidget;
+    GraphWidget* psdGraphWidget;
+    GraphWidget* sinrGraphWidget;
 
     QMap<QString, QMap<QString,Ptr<PLC_TransferBase> > > transferFunctions;
 };

@@ -93,7 +93,7 @@ QVector<QVector<double> > PLCSimulator::spectrumValueToPlottable(Ptr<SpectrumVal
         double mag = std::abs(*v_it);
 
         if(mag != 0){
-            yVals.push_back(20.0*std::log10(mag));
+            yVals.push_back(10.0*std::log10(mag));
         } else {
             xVals.pop_back();
         }
@@ -150,7 +150,7 @@ QVector<QVector<double> > PLCSimulator::ctfToPlottable(Ptr<PLC_TransferVector> c
     return ret;
 }
 
-PLCSimulator::PLCSimulator(){
+PLCSimulator::PLCSimulator(): QObject(0){
     QSharedMemory *sharedMemory = new QSharedMemory("PLC_TOPOLOGY_JSON_DATA");
     sharedMemory->attach();
 
@@ -169,7 +169,7 @@ PLCSimulator::PLCSimulator(){
     setupWidgets();
 }
 
-PLCSimulator::PLCSimulator(QString modelFileName){
+PLCSimulator::PLCSimulator(QString modelFileName): QObject(0){
     QFile modelFile(modelFileName);
     modelFile.open(QIODevice::ReadOnly);
 
@@ -189,44 +189,123 @@ void PLCSimulator::setupWidgets(){
     bodeWindow->setWindowTitle("Channel Transfer Functions");
     bodeWindow->resize(600, 400);
 
-    graphWidget = new GraphWidget();
-    graphWidget->setWindowTitle("SINR/RxPSD And stuff");
-    graphWidget->resize(600, 400);
-}
+    psdGraphWidget = new GraphWidget();
+    psdGraphWidget->setWindowTitle("Rx Power Spectral Density (dB)");
+    psdGraphWidget->resize(600, 400);
 
+    sinrGraphWidget = new GraphWidget();
+    sinrGraphWidget->setWindowTitle("Rx SINR (dB)");
+    sinrGraphWidget->resize(600, 400);
+}
 
 void PLCSimulator::showBodeWindow(){
     bodeWindow->getPlot()->replot();
     bodeWindow->show();
 }
 
-void PLCSimulator::showPlotWindow(){
-    graphWidget->getPlot()->rescaleAxes();
-    graphWidget->getPlot()->replot();
-    graphWidget->show();
+void PLCSimulator::showPsdPlotWindow(){
+    psdGraphWidget->getPlot()->rescaleAxes();
+    psdGraphWidget->getPlot()->replot();
+    psdGraphWidget->show();
+}
+
+void PLCSimulator::showSinrPlotWindow(){
+    sinrGraphWidget->getPlot()->rescaleAxes();
+    sinrGraphWidget->getPlot()->replot();
+    sinrGraphWidget->show();
 }
 
 int PLCSimulator::numberOfPlots(){
     return bodeWindow->getPlot()->getNumberPlots();
 }
 
+void PLCSimulator::collectTransferFunctions(QStringList enTxNodes, QStringList enRxNodes){
+
+    delete(bodeWindow);
+    bodeWindow = new BodeWidgetWindow();
+
+    bodeWindow->setWindowTitle("Channel Transfer Functions");
+    bodeWindow->resize(600, 400);
+
+    transferFunctions.clear();
+
+    PLC_NetdeviceList transmitterDevices;
+    PLC_NetdeviceList receiverDevices;
+
+    QStringList receiverNames = enRxNodes;
+    QStringList transmitterNames = enTxNodes;
+
+    //Pretty bad if the named devices don't exist......
+
+    for(int i = 0; i < enTxNodes.length(); i++){
+        transmitterDevices.push_back(loader->getTransmitterByName(enTxNodes.at(i)));
+    }
+
+    for(int i = 0; i < enRxNodes.length(); i++){
+        receiverDevices.push_back(loader->getReceiverByName(enRxNodes.at(i)));
+    }
+
+    Ptr<PLC_HalfDuplexOfdmPhy> txPhy;
+    Ptr<PLC_HalfDuplexOfdmPhy> rxPhy;
+
+    Ptr<PLC_TxInterface> txIf;
+    Ptr<PLC_RxInterface> rxIf;
+
+    BodeWidget * const bodePlot = bodeWindow->getPlot();
+
+    for(unsigned int i = 0; i < transmitterDevices.size(); i++){
+
+        for(unsigned int j = 0; j< receiverDevices.size(); j++){
+            if(transmitterDevices.at(i) != receiverDevices.at(j)){
+
+                txPhy = transmitterDevices.at(i)->GetHalfDuplexPhy();
+                txIf = txPhy->GetTxInterface();
+
+                rxPhy = receiverDevices.at(j)->GetHalfDuplexPhy();
+                rxIf = rxPhy->GetRxInterface();
+
+                transmitterDevices.at(i)->GetChannelTransferImpl((receiverDevices.at(j)))->CalculateChannelTransferVector();
+
+                PLC_ChannelTransferImpl *chImpl = txIf->GetChannelTransferImpl(PeekPointer(rxIf));
+                NS_ABORT_MSG_IF(chImpl == NULL, "no channel from rxDev to txDev");
+
+                Ptr<PLC_TransferBase> chTransFunc = chImpl->GetChannelTransferVector();
+
+                transferFunctions[transmitterNames.at(i)][receiverNames.at(j)] = chTransFunc;
+
+                QString name;
+                name += transmitterNames.at(i) + "-to-" + receiverNames.at(j);
+
+                NS_ASSERT(chTransFunc->GetValueType() == PLC_ValueBase::FREQ_SELECTIVE);
+
+                if(chTransFunc->IsTimeVariant()){
+                    qDebug() << "Cannot plot time variant functions. Exporting to" << (name + ".dat");
+                    exportTransferData(name, chTransFunc);
+                }
+                else{
+                    //Plot the channel transfer functionnew BodeWidget();
+                    Ptr<PLC_TransferVector> data = StaticCast<PLC_TransferVector, PLC_TransferBase> (chTransFunc);
+                    BodeData plotData = ctfToPlottable(data);
+
+                    qDebug() << "Adding: " << name << "to Bode Widget";
+                    bodePlot->addBodePlot(&plotData, name);
+
+                    qDebug() << "Exporting ctf to" << (name + ".dat");
+                    exportTransferData(name, chTransFunc);
+                }
+            }
+        }
+    }
+
+    qDebug() << "Diagram has" << transmitterDevices.size() << "Tx device(s) and" << receiverDevices.size() << "Rx device(s)";
+    qDebug() << "Finished collecting all channel transfer functions!";
+
+    this->showBodeWindow();
+}
+
 void PLCSimulator::collectTransferFunctions(){
 
     transferFunctions.clear();
-    //LogComponentEnable("PLC_Channel", LOG_LEVEL_FUNCTION);
-    //LogComponentEnable("PLC_Edge", LOG_LEVEL_FUNCTION);
-    //LogComponentEnable("PLC_Node", LOG_LEVEL_FUNCTION);
-
-    // Calculate Channels PULLED DIRECTLY FROM PLC-CHANNEL-TEST
-    Ptr<PLC_Channel> channel = loader->getChannel();
-
-
-    channel->InitTransmissionChannels();
-
-    PLC_NodeList netDeviceNodes = loader->getNetDeviceNodes();
-    QStringList netDeviceNames = loader->getNetDeviceNames();
-
-    PLC_NetdeviceList netDevices = loader->getNetDevices();
 
     PLC_NetdeviceList receiverDevices = loader->getReceivers();
     QStringList receiverNames = loader->getReceiverNames();
@@ -290,15 +369,17 @@ void PLCSimulator::collectTransferFunctions(){
     qDebug() << "Finished collecting all channel transfer functions!";
 }
 
-void PLCSimulator::simulateSINRAtReceiver(QString rxName, QString txName, int packetLength){
+void PLCSimulator::simulateSINRAtReceiver(bool doPSD, bool doSINR, QString txName, QString rxName){
+    delete(psdGraphWidget);
+    delete(sinrGraphWidget);
 
-    //LogComponentEnable("PLC_Channel", LOG_LEVEL_FUNCTION);
-    //LogComponentEnable("PLC_Edge", LOG_LEVEL_FUNCTION);
-    //LogComponentEnable("PLC_Node", LOG_LEVEL_FUNCTION);
-    //LogComponentEnable("PLC_Mac", LOG_LEVEL_FUNCTION);
-    //LogComponentEnable("PLC_Mac", LOG_LEVEL_LOGIC);
-    //LogComponentEnable("PLC_Phy", LOG_LEVEL_FUNCTION);
-    //LogComponentEnable("PLC_SimulatorImpl", LOG_LEVEL_FUNCTION);
+    psdGraphWidget = new GraphWidget();
+    psdGraphWidget->setWindowTitle("Rx Power Spectral Density (dB)");
+    psdGraphWidget->resize(600, 400);
+
+    sinrGraphWidget = new GraphWidget();
+    sinrGraphWidget->setWindowTitle("Rx SINR (dB)");
+    sinrGraphWidget->resize(600, 400);
 
     Ptr<PLC_NetDevice> txDev = loader->getTransmitterByName(txName);
     Ptr<PLC_NetDevice> rxDev = loader->getReceiverByName(rxName);
@@ -324,15 +405,21 @@ void PLCSimulator::simulateSINRAtReceiver(QString rxName, QString txName, int pa
     interference.StartRx(rxPSD);
 
 
-    ns3::Simulator::Run();
-    ns3::Simulator::Destroy();
+    //ns3::Simulator::Run();
+    //ns3::Simulator::Destroy();
 
     Ptr<SpectrumValue> sinr = interference.GetSINR();
 
+    psdGraphWidget->addPlot(PLCSimulator::spectrumValueToPlottable(rxPSD), rxName + QString(" rxPSD"));
+    sinrGraphWidget->addPlot(PLCSimulator::spectrumValueToPlottable(sinr), txName + QString(" SINR"));
 
+    if(doPSD){
+        showPsdPlotWindow();
+    }
 
-    graphWidget->addPlot(PLCSimulator::spectrumValueToPlottable(noiseFloor), rxName + QString(" rxPSD"));
-    //graphWidget->addPlot(PLCSimulator::spectrumValueToPlottable(sinr), txName + QString(" SINR"));
+    if(doSINR){
+        showSinrPlotWindow();
+    }
 }
 
 
@@ -393,6 +480,6 @@ void PLCSimulator::psdTest(){
 
     Ptr<SpectrumValue> sinr = interference.GetSINR();
 
-    graphWidget->addPlot(PLCSimulator::spectrumValueToPlottable(rxPsd), QString(" rxPSD"));
+    //graphWidget->addPlot(PLCSimulator::spectrumValueToPlottable(rxPsd), QString(" rxPSD"));
 
 }
