@@ -1,3 +1,6 @@
+#Workaround for MOC choking on certain boost headers. (Not that we use boost, but some of the ns3 stuff does)
+QMAKE_MOC = $$QMAKE_MOC -DBOOST_TT_HAS_OPERATOR_HPP_INCLUDED -DBOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
+
 unix: {
     LD_ENV_VAR = LD_LIBRARY_PATH
 }
