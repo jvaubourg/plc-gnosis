@@ -70,27 +70,27 @@ PLCSpectrumConfiguration::PLCSpectrumConfiguration(PLCSpectrumModel* spectrumMod
 
     mainsFreqBox = new QSpinBox();
     samplesPerCycleBox = new QSpinBox();
-    simulationTimeBox = new QSpinBox();
+    symbolLengthBox = new QSpinBox();
 
     mainsFreqBox->setRange(1, 99999);
     samplesPerCycleBox->setRange(1, 99999);
-    simulationTimeBox->setRange(0, 99999);
+    symbolLengthBox->setRange(0, 99999);
 
     mainsFreqBox->setSuffix(" Hz");
     samplesPerCycleBox->setSuffix("");
-    simulationTimeBox->setSuffix(" us");
+    symbolLengthBox->setSuffix(" us");
 
     mainsFreqBox->setValue(spectrum->getMainsFrequency());
     samplesPerCycleBox->setValue(spectrum->getSamplesPerCycle());
-    simulationTimeBox->setValue(spectrum->getSymbolLength());
+    symbolLengthBox->setValue(spectrum->getSymbolLength());
 
     timeSettingsLayout->addWidget(mainsFreqBox, 0, 1);
     timeSettingsLayout->addWidget(samplesPerCycleBox, 1, 1);
-    timeSettingsLayout->addWidget(simulationTimeBox, 2, 1);
+    timeSettingsLayout->addWidget(symbolLengthBox, 2, 1);
 
     connect(mainsFreqBox, SIGNAL(valueChanged(int)), this, SLOT(saveValues()));
     connect(samplesPerCycleBox, SIGNAL(valueChanged(int)), this, SLOT(saveValues()));
-    connect(simulationTimeBox, SIGNAL(valueChanged(int)), this, SLOT(saveValues()));
+    connect(symbolLengthBox, SIGNAL(valueChanged(int)), this, SLOT(saveValues()));
 
     innerLayout->addWidget(spectrumSettingsGroupBox);
     innerLayout->addWidget(timeSettingsGroupBox);
@@ -111,22 +111,20 @@ PLCSpectrumConfiguration::PLCSpectrumConfiguration(PLCSpectrumModel* spectrumMod
 
 void PLCSpectrumConfiguration::saveValues(void)
 {
+    bool validValues = true;
+
     spectrum->setLowerBandLimit(freqLimitLowBox->value()*1000.0);
     spectrum->setBandResolution(freqResBox->value()*1000.0);
     spectrum->setUpperBandLimit(spectrum->getLowerBandLimit() + (spectrum->getBandResolution() * freqNumBandsBox->value()));
 
     spectrum->setMainsFrequency(mainsFreqBox->value());
-    spectrum->setSymbolLength(simulationTimeBox->value());
-
+    spectrum->setSymbolLength(symbolLengthBox->value());
     spectrum->setSamplesPerCycle(samplesPerCycleBox->value());
 
-    if ((spectrum->getLowerBandLimit() < spectrum->getUpperBandLimit() && spectrum->getBandResolution() > 0) &&
-            ((spectrum->getUpperBandLimit() - spectrum->getLowerBandLimit()) / 2.0) > spectrum->getBandResolution())
-	{
-		okButton->setDisabled(false);
-	}
-	else
-	{
-		okButton->setDisabled(true);
-	}
+    validValues &= (spectrum->getLowerBandLimit() <= spectrum->getUpperBandLimit());
+    validValues &= spectrum->getBandResolution() > 0;
+
+    validValues &= (1.0/(spectrum->getMainsFrequency() * spectrum->getSamplesPerCycle())) <= (spectrum->getSymbolLength() * 1.0e-6);
+
+    okButton->setDisabled(!validValues);
 }

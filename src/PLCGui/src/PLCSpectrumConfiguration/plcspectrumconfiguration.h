@@ -33,7 +33,7 @@ public:
     PLCSpectrumConfiguration(PLCSpectrumModel* spectrumModel, QWidget *parent = 0);
 
     QDoubleSpinBox *freqLimitLowBox, *freqResBox, *noiseFloorBox;
-    QSpinBox       *freqNumBandsBox, *mainsFreqBox, *samplesPerCycleBox, *simulationTimeBox;
+    QSpinBox       *freqNumBandsBox, *mainsFreqBox, *samplesPerCycleBox, *symbolLengthBox;
 
     PLCSpectrumModel* spectrum;
 
