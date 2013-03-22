@@ -36,6 +36,8 @@ PLCTopologyLoader::incrementMacAddress(Mac48Address *addr)
 
 PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
 
+    validInputValues = true;
+
     PLC_SpectrumModelHelper smHelper;
 
     double numBands = (topologyModel.getSpectrumModel().getUpperBandLimit() - topologyModel.getSpectrumModel().getLowerBandLimit());
@@ -63,7 +65,7 @@ PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
     //Loop through the nodes, and create as necessary.
     for(int i = 0; i < topologyNodes->length(); i++){
         NodeModel* currentNode = topologyNodes->at(i);
-        Ptr<PLC_Node> newNode = fromNodeModel(currentNode, sm);
+        Ptr<PLC_Node> newNode = fromNodeModel(currentNode, sm, validInputValues);
 
         //Add the node to our tracking variables
         plcGraph->AddNode(newNode);
@@ -72,7 +74,7 @@ PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
         //Loop through nodes net devices and create as necessary
         if(currentNode->getNetDevice() != 0)
         {
-            Ptr<PLC_NetDevice> newNetDevice = fromNetDeviceModel(currentNode->getNetDevice(), sm, newNode, addr);
+            Ptr<PLC_NetDevice> newNetDevice = fromNetDeviceModel(currentNode->getNetDevice(), sm, newNode, addr, validInputValues);
             PLCTopologyLoader::incrementMacAddress(&addr);
 
             QString netDeviceName = currentNode->getNetDevice()->getName();
@@ -99,8 +101,9 @@ PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
 
         //Loop Through Node noise sources and create as necessary.
         if(currentNode->getNoiseSource() != 0){
-            Ptr<PLC_NoiseSource> newNoiseSource = fromNoiseSourceModel(currentNode->getNoiseSource(), sm, newNode);
-            this->noiseSources.push_back(newNode);
+            Ptr<PLC_NoiseSource> newNoiseSource = fromNoiseSourceModel(currentNode->getNoiseSource(), sm, newNode, validInputValues);
+            this->noiseSourceNodes.push_back(newNode);
+            this->noiseSources.push_back(newNoiseSource);
         }
     }
 
@@ -130,10 +133,10 @@ PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
         }
         else{
             newEdge = Create<PLC_TwoPort>(sm, fromNode, toNode,
-                                          fromValueString(currentEdge->getTwoPortParameters()[0], sm),
-                                          fromValueString(currentEdge->getTwoPortParameters()[1], sm),
-                                          fromValueString(currentEdge->getTwoPortParameters()[2], sm),
-                                          fromValueString(currentEdge->getTwoPortParameters()[3], sm));
+                                          fromValueString(currentEdge->getTwoPortParameters()[0], sm, validInputValues),
+                                          fromValueString(currentEdge->getTwoPortParameters()[1], sm, validInputValues),
+                                          fromValueString(currentEdge->getTwoPortParameters()[2], sm, validInputValues),
+                                          fromValueString(currentEdge->getTwoPortParameters()[3], sm, validInputValues));
         }
 
         //Reset the 'to' nodes original position.
@@ -161,7 +164,7 @@ Ptr<PLC_ValueBase> PLCTopologyLoader::infinity(Ptr<const SpectrumModel> spectrum
 //This function loads a csv file containing data (constant, time varying, frequency varying, or both) from a data file.
 //The data file is just a CSV dump of two matrices, [A;B] where A is the REAL part of the data, and B is the IMAGINARY part
 //of the data
-Ptr<PLC_ValueBase> PLCTopologyLoader::valueFromFile(const QString& file, Ptr<const SpectrumModel> spectrumModel){
+Ptr<PLC_ValueBase> PLCTopologyLoader::valueFromFile(const QString& file, Ptr<const SpectrumModel> spectrumModel, bool& ok){
     QFile dataFile(file);
 
     dataFile.open(QIODevice::ReadOnly);
@@ -174,8 +177,23 @@ Ptr<PLC_ValueBase> PLCTopologyLoader::valueFromFile(const QString& file, Ptr<con
     int rows = lines.length();
     int cols = lines.at(0).split(',').length();
 
+    int timeSlots = PLC_Time::GetNumTimeslots();
+    int freqBands = spectrumModel->GetNumBands();
+
     qDebug() << "Loading file: " << file;
     qDebug() << "  Dimensions: " << '(' << (rows/2) << "Time Slots," << cols << "Freq. Slots)";
+
+    if((freqBands != cols) && (cols != 1)){
+        qDebug() << "The specified number of frequency bands (" << freqBands << ") does not match the number of columns in" << file << '(' << cols << ')';
+        ok = false;
+        return Create<PLC_ConstValue>(spectrumModel, 0);
+    }
+
+    if((timeSlots != (rows/2)) && (rows/2 != 1)){
+        qDebug() << "The specified number of time samples (" << timeSlots << ") does not match the number of rows in" << file << '(' << rows/2 << ')';
+        ok = false;
+        return Create<PLC_ConstValue>(spectrumModel, 0);
+    }
 
     QList<QList<double> > data;
     QList<double> currentRow;
@@ -205,6 +223,32 @@ Ptr<PLC_ValueBase> PLCTopologyLoader::valueFromFile(const QString& file, Ptr<con
 
     //We have half as many rows because we folded the second half into the imaginary part of complex values
     rows /= 2;
+
+    if(rows == 1 && (timeSlots > 1)){
+        qDebug() << "Note:" << file << "has specified only one row. Extending this for each time sample.";
+        //extend for each row
+        for(int i = 0; i < (timeSlots - 1); i++){
+            complexValues.push_back(complexValues.at(0));
+        }
+
+        rows = timeSlots;
+    }
+
+    if(cols == 1 && (freqBands > 1)){
+        qDebug() << "Note:" << file << "has specified only one column. Extending this for each frequency band.";
+
+        for(int i = 0; i < rows; i++){
+            currentComplexRow = complexValues.at(i);
+            std::complex<double> val = currentRow.at(0);
+            for(int j = 0; j < (freqBands - 1); j++){
+                currentComplexRow.push_back(val);
+            }
+
+            complexValues.at(i) = currentComplexRow;
+        }
+
+        cols = freqBands;
+    }
 
     if(rows == 1 || cols == 1){
         std::vector<complex<double> > valueVector;
@@ -238,16 +282,18 @@ Ptr<PLC_ConstValue> PLCTopologyLoader::constFromValueString(PLCValueString value
     return Create<PLC_ConstValue>(spectrumModel, value.getComplex());
 }
 
-Ptr<PLC_ValueBase> PLCTopologyLoader::fromValueString(PLCValueString value, Ptr<const SpectrumModel> spectrumModel){
+Ptr<PLC_ValueBase> PLCTopologyLoader::fromValueString(PLCValueString value, Ptr<const SpectrumModel> spectrumModel, bool &ok){
     if(value.isFile()){
-        return valueFromFile(value.getValue(), spectrumModel);
+        return valueFromFile(value.getValue(), spectrumModel, ok);
     }
     else{
         return constFromValueString(value.getValue(), spectrumModel);
     }
 }
 
-Ptr<PLC_NoiseSource> PLCTopologyLoader::fromNoiseSourceModel(NoiseSourceModel *noiseSource, Ptr<const SpectrumModel> spectrumModel, Ptr<PLC_Node> sourceNode){
+Ptr<PLC_NoiseSource> PLCTopologyLoader::fromNoiseSourceModel(NoiseSourceModel *noiseSource, Ptr<const SpectrumModel> spectrumModel, Ptr<PLC_Node> sourceNode, bool& valid){
+
+    Q_UNUSED(valid)
 
     Ptr<PLC_NoiseSource> newNoiseSource;
 
@@ -267,7 +313,7 @@ Ptr<PLC_NoiseSource> PLCTopologyLoader::fromNoiseSourceModel(NoiseSourceModel *n
     return newNoiseSource;
 }
 
-Ptr<PLC_NetDevice> PLCTopologyLoader::fromNetDeviceModel(NetDeviceModel *netDevice, Ptr<const SpectrumModel> spectrumModel, Ptr<PLC_Node> sourceNode, 	Mac48Address addr){
+Ptr<PLC_NetDevice> PLCTopologyLoader::fromNetDeviceModel(NetDeviceModel *netDevice, Ptr<const SpectrumModel> spectrumModel, Ptr<PLC_Node> sourceNode, Mac48Address addr, bool& valid){
 
     ObjectFactory netDeviceFactory;
     netDeviceFactory.SetTypeId(PLC_SimpleNetDevice::GetTypeId());
@@ -295,11 +341,11 @@ Ptr<PLC_NetDevice> PLCTopologyLoader::fromNetDeviceModel(NetDeviceModel *netDevi
     newNetDevice->SetPlcNode(sourceNode);
 
     if(!netDevice->getShuntImpedance().getValue().isEmpty()){
-        newNetDevice->SetShuntImpedance(fromValueString(netDevice->getShuntImpedance(), spectrumModel));
+        newNetDevice->SetShuntImpedance(fromValueString(netDevice->getShuntImpedance(), spectrumModel, valid));
     }
 
-    newNetDevice->SetRxImpedance(fromValueString(netDevice->getRXImpedance(), spectrumModel));
-    newNetDevice->SetTxImpedance(fromValueString(netDevice->getTXImpedance(), spectrumModel));
+    newNetDevice->SetRxImpedance(fromValueString(netDevice->getRXImpedance(), spectrumModel, valid));
+    newNetDevice->SetTxImpedance(fromValueString(netDevice->getTXImpedance(), spectrumModel, valid));
 
     newNetDevice->SetSpectrumModel(spectrumModel);
 
@@ -314,13 +360,13 @@ Ptr<PLC_NetDevice> PLCTopologyLoader::fromNetDeviceModel(NetDeviceModel *netDevi
     return newNetDevice;
 }
 
-Ptr<PLC_Node> PLCTopologyLoader::fromNodeModel(NodeModel *node, Ptr<const SpectrumModel> spectrumModel){
+Ptr<PLC_Node> PLCTopologyLoader::fromNodeModel(NodeModel *node, Ptr<const SpectrumModel> spectrumModel, bool &valid){
     Ptr<PLC_Node> newNode = Create<PLC_Node>();
 
     newNode->SetName(node->getName().toStdString());
     //Creating outlet might need to be done last or else net devices will overwrite it??
     if(node->getHasOutlet()){
-        Ptr<PLC_Outlet> newOutlet = Create<PLC_Outlet>(newNode, fromValueString(node->getOutletImpedance(), spectrumModel));
+        Ptr<PLC_Outlet> newOutlet = Create<PLC_Outlet>(newNode, fromValueString(node->getOutletImpedance(), spectrumModel, valid));
     }
 
     //TODO: Double check that the position isn't used anywhere else other than when calculate is called on an edge...

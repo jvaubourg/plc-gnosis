@@ -33,15 +33,15 @@ class PLCTopologyLoader
 public:
     PLCTopologyLoader(PLCTopologyModel topologyModel);
 
-    static Ptr<PLC_Node>        fromNodeModel(NodeModel* node, Ptr<const SpectrumModel> spectrumModel);
-    static Ptr<PLC_Edge>        fromEdgeModel(EdgeModel* edge, Ptr<const SpectrumModel> spectrumModel);
-    static Ptr<PLC_NetDevice>   fromNetDeviceModel(NetDeviceModel* netDevice, Ptr<const SpectrumModel> spectrumModel, Ptr<PLC_Node> sourceNode, Mac48Address addr);
-    static Ptr<PLC_NoiseSource> fromNoiseSourceModel(NoiseSourceModel* noiseSource, Ptr<const SpectrumModel> spectrumModel, Ptr<PLC_Node> sourceNode);
+    static Ptr<PLC_Node>        fromNodeModel(NodeModel* node, Ptr<const SpectrumModel> spectrumModel, bool& valid);
+    static Ptr<PLC_Edge>        fromEdgeModel(EdgeModel* edge, Ptr<const SpectrumModel> spectrumModel, bool& valid);
+    static Ptr<PLC_NetDevice>   fromNetDeviceModel(NetDeviceModel* netDevice, Ptr<const SpectrumModel> spectrumModel, Ptr<PLC_Node> sourceNode, Mac48Address addr, bool& valid);
+    static Ptr<PLC_NoiseSource> fromNoiseSourceModel(NoiseSourceModel* noiseSource, Ptr<const SpectrumModel> spectrumModel, Ptr<PLC_Node> sourceNode, bool& valid);
 
     static Ptr<PLC_ValueBase>   infinity(Ptr<const SpectrumModel> spectrumModel);
-    static Ptr<PLC_ValueBase>   valueFromFile(const QString& file, Ptr<const SpectrumModel> spectrumModel);
+    static Ptr<PLC_ValueBase>   valueFromFile(const QString& file, Ptr<const SpectrumModel> spectrumModel, bool& ok);
     static Ptr<PLC_ConstValue>  constFromValueString(PLCValueString value, Ptr<const SpectrumModel> spectrumModel);
-    static Ptr<PLC_ValueBase>   fromValueString(PLCValueString value, Ptr<const SpectrumModel> spectrumModel);
+    static Ptr<PLC_ValueBase>   fromValueString(PLCValueString value, Ptr<const SpectrumModel> spectrumModel, bool& ok);
 
     static void incrementMacAddress(Mac48Address *addr);
 
@@ -62,6 +62,8 @@ public:
     Ptr<PLC_NetDevice> getTransmitterByName(QString name){ return transmitters.at(transmitterNameToIndexMap.value(name)); }
     Ptr<PLC_NetDevice> getReceiverByName(QString name){ return receivers.at(receiverNameToIndexMap.value(name)); }
 
+    bool topologyIsValid() {return validInputValues; }
+
 private:
 
     Ptr<SpectrumModel> spectrumModel;
@@ -69,7 +71,12 @@ private:
     QMap<QString, Ptr<PLC_Node> > nodesByName;
 
     PLC_NodeList netDeviceNodes;
-    PLC_NodeList noiseSources;
+    PLC_NodeList noiseSourceNodes;
+    PLC_NoiseSourceList noiseSources;
+
+    PLC_NodeList outletNodes;
+    PLC_OutletList outlets;
+
 
     PLC_NetdeviceList netDevices;
     QStringList netDeviceNames;
@@ -87,6 +94,8 @@ private:
     Ptr<PLC_Graph> plcGraph;
 
     Ptr<PLC_Channel> channel;
+
+    bool validInputValues;
 };
 
 #endif // PLCTOPOLOGYLOADER_H

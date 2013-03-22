@@ -152,7 +152,11 @@ QVector<QVector<double> > PLCSimulator::ctfToPlottable(Ptr<PLC_TransferVector> c
 
 PLCSimulator::PLCSimulator(): QObject(0){
     QSharedMemory *sharedMemory = new QSharedMemory("PLC_TOPOLOGY_JSON_DATA");
-    sharedMemory->attach();
+
+    if(!sharedMemory->attach()){
+        canSimulate = false;
+        return;
+    };
 
     sharedMemory->lock();
     QByteArray jsonData((const char*)sharedMemory->constData(), sharedMemory->size());
@@ -165,6 +169,8 @@ PLCSimulator::PLCSimulator(): QObject(0){
     QVariantMap modelData = parser.parse(jsonData).toMap();
     PLCTopologyModel* topologyModel = new PLCTopologyModel(modelData);
     this->loader = new PLCTopologyLoader(*topologyModel);
+
+    canSimulate = loader->topologyIsValid();
 
     setupWidgets();
 }
@@ -179,6 +185,8 @@ PLCSimulator::PLCSimulator(QString modelFileName): QObject(0){
     QVariantMap modelData = parser.parse(jsonData).toMap();
     PLCTopologyModel* topologyModel = new PLCTopologyModel(modelData);
     this->loader = new PLCTopologyLoader(*topologyModel);
+
+    canSimulate = loader->topologyIsValid();
 
     setupWidgets();
 }

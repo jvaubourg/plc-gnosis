@@ -29,6 +29,8 @@ public:
     void showBodeWindow();
     int numberOfPlots();
 
+    bool validTopology(){ return canSimulate; }
+
     void psdTest();
 
     PLCTopologyLoader* getLoader(){return loader;}
@@ -51,6 +53,8 @@ private:
 
     GraphWidget* psdGraphWidget;
     GraphWidget* sinrGraphWidget;
+
+    bool canSimulate;
 
     QMap<QString, QMap<QString,Ptr<PLC_TransferBase> > > transferFunctions;
 };
