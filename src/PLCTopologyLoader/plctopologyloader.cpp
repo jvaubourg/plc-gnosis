@@ -271,7 +271,7 @@ Ptr<PLC_NoiseSource> PLCTopologyLoader::fromNoiseSourceModel(NoiseSourceModel *n
 
     Q_UNUSED(valid)
 
-    LogComponentEnable("PLC_Noise", LOG_LEVEL_FUNCTION);
+    //LogComponentEnable("PLC_Noise", LOG_LEVEL_FUNCTION);
 
     Ptr<PLC_NoiseSource> newNoiseSource;
 
