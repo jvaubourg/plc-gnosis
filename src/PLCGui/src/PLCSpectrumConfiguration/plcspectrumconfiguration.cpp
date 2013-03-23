@@ -14,6 +14,8 @@
 #include "plcspectrumconfiguration.h"
 #include <QDebug>
 
+#include <math.h>
+
 PLCSpectrumConfiguration::PLCSpectrumConfiguration(PLCSpectrumModel* spectrumModel, QWidget *parent)
     : QDialog(parent)
 {
@@ -37,7 +39,7 @@ PLCSpectrumConfiguration::PLCSpectrumConfiguration(PLCSpectrumModel* spectrumMod
     freqResBox = new QDoubleSpinBox();
 
     freqLimitLowBox->setRange(0, 99999);
-    freqNumBandsBox->setRange(0, 99999);
+    freqNumBandsBox->setRange(2, 99999);
     freqResBox->setRange(0, 99999);
 
     freqLimitLowBox->setDecimals(3);
@@ -66,7 +68,9 @@ PLCSpectrumConfiguration::PLCSpectrumConfiguration(PLCSpectrumModel* spectrumMod
 
     timeSettingsLayout->addWidget(new QLabel("Main Frequency:"), 0, 0);
     timeSettingsLayout->addWidget(new QLabel("Samples per Cycle:"), 1, 0);
-    timeSettingsLayout->addWidget(new QLabel("Symbol Length:"), 2, 0);
+    timeSettingsLayout->addWidget(new QLabel("    "), 2, 0); //Spacer
+
+    //timeSettingsLayout->addWidget(new QLabel("Symbol Length:"), 2, 0);
 
     mainsFreqBox = new QSpinBox();
     samplesPerCycleBox = new QSpinBox();
@@ -86,11 +90,11 @@ PLCSpectrumConfiguration::PLCSpectrumConfiguration(PLCSpectrumModel* spectrumMod
 
     timeSettingsLayout->addWidget(mainsFreqBox, 0, 1);
     timeSettingsLayout->addWidget(samplesPerCycleBox, 1, 1);
-    timeSettingsLayout->addWidget(symbolLengthBox, 2, 1);
+    //timeSettingsLayout->addWidget(symbolLengthBox, 2, 1);
 
     connect(mainsFreqBox, SIGNAL(valueChanged(int)), this, SLOT(saveValues()));
     connect(samplesPerCycleBox, SIGNAL(valueChanged(int)), this, SLOT(saveValues()));
-    connect(symbolLengthBox, SIGNAL(valueChanged(int)), this, SLOT(saveValues()));
+    //connect(symbolLengthBox, SIGNAL(valueChanged(int)), this, SLOT(saveValues()));
 
     innerLayout->addWidget(spectrumSettingsGroupBox);
     innerLayout->addWidget(timeSettingsGroupBox);
@@ -118,13 +122,19 @@ void PLCSpectrumConfiguration::saveValues(void)
     spectrum->setUpperBandLimit(spectrum->getLowerBandLimit() + (spectrum->getBandResolution() * freqNumBandsBox->value()));
 
     spectrum->setMainsFrequency(mainsFreqBox->value());
-    spectrum->setSymbolLength(symbolLengthBox->value());
     spectrum->setSamplesPerCycle(samplesPerCycleBox->value());
+    //spectrum->setSymbolLength(symbolLengthBox->value());
+
+
+    //Sets a default symbol length for now until it's something that we actually need (if ever)
+    double cyclePeriod = 1.0/spectrum->getMainsFrequency();
+    double resolution = cyclePeriod/spectrum->getSamplesPerCycle();
+
+    spectrum->setSymbolLength (1.0e6 * ceil(resolution));
 
     validValues &= (spectrum->getLowerBandLimit() <= spectrum->getUpperBandLimit());
     validValues &= spectrum->getBandResolution() > 0;
-
-    validValues &= (1.0/(spectrum->getMainsFrequency() * spectrum->getSamplesPerCycle())) <= (spectrum->getSymbolLength() * 1.0e-6);
+    //validValues &= (1.0/(spectrum->getMainsFrequency() * spectrum->getSamplesPerCycle())) <= (spectrum->getSymbolLength() * 1.0e-6);
 
     okButton->setDisabled(!validValues);
 }

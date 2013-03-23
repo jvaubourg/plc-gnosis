@@ -378,6 +378,10 @@ void PLCSimulator::collectTransferFunctions(){
 }
 
 void PLCSimulator::simulateSINRAtReceiver(bool doPSD, bool doSINR, QString txName, QString rxName){
+
+    //LogComponentEnable("PLC_Phy", LOG_LEVEL_FUNCTION);
+    //LogComponentEnable("PLC_Mac", LOG_LEVEL_FUNCTION);
+
     delete(psdGraphWidget);
     delete(sinrGraphWidget);
 
@@ -398,6 +402,10 @@ void PLCSimulator::simulateSINRAtReceiver(bool doPSD, bool doSINR, QString txNam
     Ptr<PLC_TxInterface> txIf = txPhy->GetTxInterface();
     Ptr<PLC_RxInterface> rxIf = rxPhy->GetRxInterface();
 
+    //Ptr<Packet> p = Create<Packet> (10000);
+    //ns3::Simulator::Schedule(Seconds(1), &PLC_NetDevice::Send, txDev, p, rxDev->GetAddress(), 0);
+    //ns3::Simulator::Stop(Seconds(30));
+    //ns3::Simulator::Run();
 
     // The receive power spectral density computation is done by the channel
     // transfer implementation from TX interface to RX interface
@@ -412,8 +420,6 @@ void PLCSimulator::simulateSINRAtReceiver(bool doPSD, bool doSINR, QString txNam
     interference.SetNoiseFloor(noiseFloor);
     interference.StartRx(rxPSD);
 
-
-    //ns3::Simulator::Run();
     //ns3::Simulator::Destroy();
 
     Ptr<SpectrumValue> sinr = interference.GetSINR();

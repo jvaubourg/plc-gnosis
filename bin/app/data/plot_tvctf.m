@@ -1,8 +1,7 @@
-function [] = plot_tvctf(fileName)
+function [] = plot_tvctf(freqAxis, timeAxis, data)
 
-[freqAxis timeAxis data] = load_ctf(fileName);
 figure;
-imagesc(freqAxis, timeAxis, abs(data));
+imagesc(freqAxis, timeAxis, 20*log10(abs(data)));
 colorbar;
 xlabel('Frequency (Hz)');
 ylabel('Time (s)');

@@ -8,3 +8,4 @@ freqAxis = linspace(freqData(1), freqData(2), freqData(3));
 timeAxis = linspace(0, timeData(1), timeData(2));
 dataSize = size(ctfData);
 data = ctfData(1 : dataSize(1)/2, :) + i*ctfData(dataSize(1)/2 + 1 : end, :);
+

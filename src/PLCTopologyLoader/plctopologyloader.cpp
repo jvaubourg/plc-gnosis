@@ -8,6 +8,7 @@
 #include "ns3/plc-spectrum-helper.h"
 #include "ns3/object-factory.h"
 #include "ns3/plc-device-helper.h"
+#include "ns3/simulator.h"
 
 void
 PLCTopologyLoader::incrementMacAddress(Mac48Address *addr)
@@ -224,31 +225,6 @@ Ptr<PLC_ValueBase> PLCTopologyLoader::valueFromFile(const QString& file, Ptr<con
     //We have half as many rows because we folded the second half into the imaginary part of complex values
     rows /= 2;
 
-    if(rows == 1 && (timeSlots > 1)){
-        qDebug() << "Note:" << file << "has specified only one row. Extending this for each time sample.";
-        //extend for each row
-        for(int i = 0; i < (timeSlots - 1); i++){
-            complexValues.push_back(complexValues.at(0));
-        }
-
-        rows = timeSlots;
-    }
-
-    if(cols == 1 && (freqBands > 1)){
-        qDebug() << "Note:" << file << "has specified only one column. Extending this for each frequency band.";
-
-        for(int i = 0; i < rows; i++){
-            currentComplexRow = complexValues.at(i);
-            std::complex<double> val = currentRow.at(0);
-            for(int j = 0; j < (freqBands - 1); j++){
-                currentComplexRow.push_back(val);
-            }
-
-            complexValues.at(i) = currentComplexRow;
-        }
-
-        cols = freqBands;
-    }
 
     if(rows == 1 || cols == 1){
         std::vector<complex<double> > valueVector;
@@ -295,18 +271,29 @@ Ptr<PLC_NoiseSource> PLCTopologyLoader::fromNoiseSourceModel(NoiseSourceModel *n
 
     Q_UNUSED(valid)
 
+    LogComponentEnable("PLC_Noise", LOG_LEVEL_FUNCTION);
+
     Ptr<PLC_NoiseSource> newNoiseSource;
 
     Ptr<SpectrumValue> noisePSD = Create<SpectrumValue>(spectrumModel);
     (*noisePSD) = noiseSource->getNoisePSD().getReal();
 
     if(noiseSource->getNoiseType() == "Static"){
-        newNoiseSource = Create<PLC_StaticNoiseSource>(sourceNode, noisePSD);
+        Ptr<PLC_StaticNoiseSource> staticNoise = Create<PLC_StaticNoiseSource>(sourceNode, noisePSD);
+        newNoiseSource = staticNoise;
+        staticNoise->Init();
+        newNoiseSource->Enable();
+        //Simulator::Schedule(Seconds(0), &PLC_StaticNoiseSource::Start, PeekPointer(staticNoise), Seconds(30));
+
     }
 
     if(noiseSource->getNoiseType() == "Impulsive"){
         newNoiseSource = Create<PLC_ImpulsiveNoiseSource>(sourceNode, noisePSD);
+        newNoiseSource->Init();
+        newNoiseSource->Enable();
     }
+
+
 
     //TODO: Adding on/off timing for the impulse noise source?
 

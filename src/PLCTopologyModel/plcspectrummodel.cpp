@@ -7,8 +7,8 @@ PLCSpectrumModel::PLCSpectrumModel()
     this->bandResolution = 1000.00;
 
     this->mainsFrequency = 50;
-    this->samplesPerCycle = 50;
-    this->symbolLength = 750.0;
+    this->samplesPerCycle = 1;
+    this->symbolLength = 1.0e6/(50.0);
 
     this->noiseFloor = 1e-7;
 }

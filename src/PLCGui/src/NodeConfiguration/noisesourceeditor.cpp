@@ -26,6 +26,7 @@ NoiseSourceEditor::NoiseSourceEditor(NoiseSourceModel* source, QWidget *parent) 
 
 
     noisePSDInput = new PLCDataInputWidget("Noise PSD", this);
+    noisePSDInput->setCheckable(false);
 
     QVBoxLayout * editorLayout = new QVBoxLayout();
     editorLayout->addLayout(nameLayout);
@@ -56,5 +57,6 @@ void NoiseSourceEditor::saveChanges(){
     if(isValid()){
         this->noiseSrcModel->setName(nameEdit->text());
         this->noiseSrcModel->setNoisePSD(noisePSDInput->getValue());
+        this->noiseSrcModel->setNoiseType(noiseTypeSelector->currentText());
     }
 }

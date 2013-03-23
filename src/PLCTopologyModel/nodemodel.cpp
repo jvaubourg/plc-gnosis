@@ -46,7 +46,7 @@ QVariantMap NodeModel::toVariantMap(){
     }
 
     if(noiseSource != 0){
-        map["NoiseSources"] = noiseSource->toVariantMap();
+        map["NoiseSource"] = noiseSource->toVariantMap();
     }
 
     map["OutletImpedance"] = outletImpedance.getValue();
