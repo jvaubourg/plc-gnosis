@@ -133,7 +133,7 @@ PLCTopologyLoader::PLCTopologyLoader(PLCTopologyModel topologyModel){
             newEdge = Create<PLC_Line>(cable, fromNode, toNode);
         }
         else{
-            newEdge = Create<PLC_TwoPort>(sm, fromNode, toNode,
+            newEdge = Create<PLC_TwoPort>(sm, toNode, fromNode,
                                           fromValueString(currentEdge->getTwoPortParameters()[0], sm, validInputValues),
                                           fromValueString(currentEdge->getTwoPortParameters()[1], sm, validInputValues),
                                           fromValueString(currentEdge->getTwoPortParameters()[2], sm, validInputValues),

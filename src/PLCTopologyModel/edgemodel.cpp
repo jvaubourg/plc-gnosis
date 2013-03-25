@@ -45,6 +45,7 @@ void EdgeModel::fromVariantMap(const QVariantMap &map){
     }
     else{
         isCable = false;
+        length = 1;
 
         QVariantList parameters = map["Parameters"].toList();
 

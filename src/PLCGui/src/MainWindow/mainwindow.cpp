@@ -156,7 +156,7 @@ void MainWindow::saveCurrentSheet(){
     if(currentSheet->getSaveToFile().isEmpty()){
         //QFileDialog dialog;
         //dialog.setFileMode(QFileDialog::AnyFile);
-        QString newFileName = QFileDialog::getSaveFileName(this, "Save Diagram File...", "", "Diagram Files (*.dgm)", 0, QFileDialog::DontUseNativeDialog);
+        QString newFileName = QFileDialog::getSaveFileName(this, "Save Diagram File...", "", "Diagram Files (*.dgm)", 0);
 
         if(!newFileName.endsWith(".dgm")){
             newFileName += ".dgm";
@@ -181,7 +181,7 @@ void MainWindow::saveCurrentSheetAs(){
 }
 
 void MainWindow::loadSheet(){
-     QString openFileName = QFileDialog::getOpenFileName(this, "Save Diagram File...", "", "Diagram Files (*.dgm)", 0, QFileDialog::DontUseNativeDialog);
+     QString openFileName = QFileDialog::getOpenFileName(this, "Save Diagram File...", "", "Diagram Files (*.dgm)", 0);
      if(openFileName.isEmpty()){
          //setCurrentSheet(new DiagramSheet());
          return;

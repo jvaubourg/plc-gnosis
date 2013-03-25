@@ -66,7 +66,7 @@ bool PLCDataInputWidget::isValid(){
 }
 
 void PLCDataInputWidget::getFile(){
-    QString file = QFileDialog::getOpenFileName(this, "Select Spectrum Data File", "./data/", "Data Files (*.vdf)", 0, QFileDialog::DontUseNativeDialog);
+    QString file = QFileDialog::getOpenFileName(this, "Select Spectrum Data File", "./data/", "Data Files (*.vdf)", 0);
 
     if(!file.isEmpty()){
         file = QDir().relativeFilePath(file);
