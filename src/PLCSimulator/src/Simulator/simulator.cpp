@@ -266,10 +266,12 @@ void PLCSimulator::collectTransferFunctions(QStringList enTxNodes, QStringList e
         for(unsigned int j = 0; j< receiverDevices.size(); j++){
             if(transmitterDevices.at(i) != receiverDevices.at(j)){
 
-                txPhy = transmitterDevices.at(i)->GetHalfDuplexPhy();
+
+                txPhy = transmitterDevices.at(i)->GetPhy()->GetObject<PLC_HalfDuplexOfdmPhy>();
+
                 txIf = txPhy->GetTxInterface();
 
-                rxPhy = receiverDevices.at(j)->GetHalfDuplexPhy();
+                rxPhy = receiverDevices.at(j)->GetPhy()->GetObject<PLC_HalfDuplexOfdmPhy>();
                 rxIf = rxPhy->GetRxInterface();
 
                 transmitterDevices.at(i)->GetChannelTransferImpl((receiverDevices.at(j)))->CalculateChannelTransferVector();
@@ -334,10 +336,10 @@ void PLCSimulator::collectTransferFunctions(){
         for(unsigned int j = 0; j< receiverDevices.size(); j++){
             if(transmitterDevices.at(i) != receiverDevices.at(j)){
 
-                txPhy = transmitterDevices.at(i)->GetHalfDuplexPhy();
+                txPhy = transmitterDevices.at(i)->GetPhy()->GetObject<PLC_HalfDuplexOfdmPhy>();
                 txIf = txPhy->GetTxInterface();
 
-                rxPhy = receiverDevices.at(j)->GetHalfDuplexPhy();
+                rxPhy = receiverDevices.at(j)->GetPhy()->GetObject<PLC_HalfDuplexOfdmPhy>();
                 rxIf = rxPhy->GetRxInterface();
 
                 transmitterDevices.at(i)->GetChannelTransferImpl((receiverDevices.at(j)))->CalculateChannelTransferVector();
@@ -396,8 +398,8 @@ void PLCSimulator::simulateSINRAtReceiver(bool doPSD, bool doSINR, QString txNam
     Ptr<PLC_NetDevice> txDev = loader->getTransmitterByName(txName);
     Ptr<PLC_NetDevice> rxDev = loader->getReceiverByName(rxName);
 
-    Ptr<PLC_HalfDuplexOfdmPhy> txPhy = txDev->GetHalfDuplexPhy();
-    Ptr<PLC_HalfDuplexOfdmPhy> rxPhy = rxDev->GetHalfDuplexPhy();
+    Ptr<PLC_HalfDuplexOfdmPhy> txPhy = txDev->GetPhy()->GetObject<PLC_HalfDuplexOfdmPhy>();
+    Ptr<PLC_HalfDuplexOfdmPhy> rxPhy = rxDev->GetPhy()->GetObject<PLC_HalfDuplexOfdmPhy>();
 
     Ptr<PLC_TxInterface> txIf = txPhy->GetTxInterface();
     Ptr<PLC_RxInterface> rxIf = rxPhy->GetRxInterface();

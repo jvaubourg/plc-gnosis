@@ -9,8 +9,8 @@ int main(int argc, char* argv[]){
 
     QApplication app(argc, argv);
 
-    PLCSimulator simulator;
-    //PLCSimulator simulator("./diagrams/ScenarioB.dgm");
+    //PLCSimulator simulator;
+    PLCSimulator simulator("./diagrams/ScenarioB.dgm");
 
     if(!simulator.validTopology()){
         qDebug() << "Invalid topology passed to the simulator. Check your terminal for specifics.";

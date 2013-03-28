@@ -124,6 +124,9 @@ void PLCGraphicsEdgeItem::paint(QPainter *painter, const QStyleOptionGraphicsIte
     if(!this->edge->isCableModel()){
         linePen.setStyle(Qt::DashDotLine);
     }
+    else{
+        linePen.setStyle(Qt::SolidLine);
+    }
 
     painter->setRenderHints(QPainter::Antialiasing | QPainter::HighQualityAntialiasing, true);
 

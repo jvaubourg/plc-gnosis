@@ -301,22 +301,25 @@ Ptr<PLC_NoiseSource> PLCTopologyLoader::fromNoiseSourceModel(NoiseSourceModel *n
 }
 
 Ptr<PLC_NetDevice> PLCTopologyLoader::fromNetDeviceModel(NetDeviceModel *netDevice, Ptr<const SpectrumModel> spectrumModel, Ptr<PLC_Node> sourceNode, Mac48Address addr, bool& valid){
+    LogComponentEnable("PLC_NetDevice", LOG_LEVEL_FUNCTION);
 
     ObjectFactory netDeviceFactory;
-    netDeviceFactory.SetTypeId(PLC_SimpleNetDevice::GetTypeId());
+    netDeviceFactory.SetTypeId(PLC_NetDevice::GetTypeId());
 
-    Ptr<PLC_SimpleNetDevice> newNetDevice = netDeviceFactory.Create<PLC_SimpleNetDevice>(); //TODO: More than just the simple net device type?
+    Ptr<PLC_NetDevice> newNetDevice = netDeviceFactory.Create<PLC_NetDevice>(); //TODO: More than just the simple net device type?
 
-    ObjectFactory errorModelFactory;
-    errorModelFactory.SetTypeId(PLC_ChannelCapacityErrorModel::GetTypeId());
+    newNetDevice->SetSpectrumModel(spectrumModel);
+    //ObjectFactory errorModelFactory;
+    //errorModelFactory.SetTypeId(PLC_ChannelCapacityErrorModel::GetTypeId());
 
     Ptr<SpectrumValue> txPsd = Create<SpectrumValue> (spectrumModel);
     (*txPsd) = 1e-7; // -40dBm
 
     /*Defaults for now -> Add to Net Device Configuration!!!*/
-    newNetDevice->SetModulationAndCodingScheme(QPSK_1_2);
+
+    //newNetDevice->SetModulationAndCodingScheme(QPSK_1_2);
     newNetDevice->SetNoiseFloor(CreateBestCaseBgNoise(spectrumModel)->GetNoisePsd());
-    newNetDevice->SetErrorModel(errorModelFactory.Create<PLC_ErrorModel>());
+    //newNetDevice->SetErrorModel(errorModelFactory.Create<PLC_ErrorModel>());
     newNetDevice->SetTxPowerSpectralDensity(txPsd);
 
     newNetDevice->SetMac(CreateObject<PLC_ArqMac>());
@@ -331,11 +334,11 @@ Ptr<PLC_NetDevice> PLCTopologyLoader::fromNetDeviceModel(NetDeviceModel *netDevi
         newNetDevice->SetShuntImpedance(fromValueString(netDevice->getShuntImpedance(), spectrumModel, valid));
     }
 
-    newNetDevice->SetRxImpedance(fromValueString(netDevice->getRXImpedance(), spectrumModel, valid));
-    newNetDevice->SetTxImpedance(fromValueString(netDevice->getTXImpedance(), spectrumModel, valid));
 
-    newNetDevice->SetSpectrumModel(spectrumModel);
 
+
+
+   // newNetDevice->CompleteConfig();
 
     //TODO: TX PSD, Device type, Address, Bridge, ErrorModel, Mod/Coding scheme.... maybe more??
     //Seems like shunt impedance gets thrown in as an outlet on the node.
@@ -343,6 +346,10 @@ Ptr<PLC_NetDevice> PLCTopologyLoader::fromNetDeviceModel(NetDeviceModel *netDevi
     //TODO: See what 'creating a node' does. Doing it for now.... they are not saved anywhere however.
     Ptr<Node> newNetNode = CreateObject<Node>();
     newNetNode->AddDevice(newNetDevice);
+
+
+    newNetDevice->SetRxImpedance(fromValueString(netDevice->getRXImpedance(), spectrumModel, valid));
+    newNetDevice->SetTxImpedance(fromValueString(netDevice->getTXImpedance(), spectrumModel, valid));
 
     return newNetDevice;
 }

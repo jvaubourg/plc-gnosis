@@ -21,7 +21,6 @@ PLCDataInputWidget::PLCDataInputWidget(const QString &paramName,
     setCheckable(checkable);
     checkBox->setChecked(checkable);
 
-
     parameterLabel = new QLabel(paramName + ":");
     parameterLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     //parameterLabel->setFixedWidth(100);
