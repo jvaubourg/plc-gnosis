@@ -10,11 +10,12 @@ bin/tmp/
 !bin/app/data/
 !bin/app/icons/
 !bin/app/diagrams/
-
+doc/
 lib/qjson
 
 *.prf
 *.pro.user
+*.pro.user.*
 Makefile
 *Makefile*
 *.Release
