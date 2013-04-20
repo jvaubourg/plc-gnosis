@@ -424,10 +424,10 @@ void PLCSimulator::simulateSINRAtReceiver(bool doPSD, bool doSINR, QString txNam
 
     //ns3::Simulator::Destroy();
 
-    Ptr<SpectrumValue> sinr = interference.GetSINR();
+    //Ptr<SpectrumValue> sinr = interference.GetSINR();
 
     psdGraphWidget->addPlot(PLCSimulator::spectrumValueToPlottable(rxPSD), rxName + QString(" rxPSD"));
-    sinrGraphWidget->addPlot(PLCSimulator::spectrumValueToPlottable(sinr), txName + QString(" SINR"));
+    //sinrGraphWidget->addPlot(PLCSimulator::spectrumValueToPlottable(sinr), txName + QString(" SINR"));
 
     if(doPSD){
         showPsdPlotWindow();
@@ -494,7 +494,7 @@ void PLCSimulator::psdTest(){
     interference.SetNoiseFloor(noiseFloor);
     interference.StartRx(rxPsd);
 
-    Ptr<SpectrumValue> sinr = interference.GetSINR();
+    //Ptr<SpectrumValue> sinr = interference.GetSINR();
 
     //graphWidget->addPlot(PLCSimulator::spectrumValueToPlottable(rxPsd), QString(" rxPSD"));
 
