@@ -12,6 +12,7 @@
 #include <QApplication>
 #include <QSharedMemory>
 #include <QTextStream>
+#include <ns3/plc-net-device.h>
 
 #include <QDebug>
 

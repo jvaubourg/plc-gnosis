@@ -7,6 +7,7 @@
 
 #include <QtCore/qglobal.h>
 #include <QStringList>
+#include <ns3/plc-net-device.h>
 #include <QDebug>
 
 #include <complex>
