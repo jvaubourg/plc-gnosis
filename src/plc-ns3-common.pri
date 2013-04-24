@@ -12,16 +12,19 @@ macx: {
 DEFINES += LD_ENV_VAR=\\\"$$LD_ENV_VAR\\\"
 DEFINES += PLC_DEFAULT_NS3_PATH=\\\"$$NS3_DIR\\\"
 
-isEmpty( NS3_DIR ){
-    error( "ns3 build directory must be specified: i.e.: 'qmake NS3_DIR=/some/path/ns3.15/build etc.'")
-}
+win32: {}
+else{
+    isEmpty( NS3_DIR ){
+        error( "ns3 build directory must be specified: i.e.: 'qmake NS3_DIR=/some/path/ns3.15/build etc.'")
+    }
 
-isEmpty( NS3_VERSION ){
-    message("NS3_VERSION Unspecified. Assuming 3.15")
-    NS3_VERSION = 3.15
-}
+    isEmpty( NS3_VERSION ){
+        message("NS3_VERSION Unspecified. Assuming 3.15")
+        NS3_VERSION = 3.15
+    }
 
-message( "Using ns3 version $$NS3_VERSION in $$NS3_DIR" )
+    message( "Using ns3 version $$NS3_VERSION in $$NS3_DIR" )
+}
 
 
 #If the LINK_NS3 variable has been defined, setup for linking against ns3 libraries.

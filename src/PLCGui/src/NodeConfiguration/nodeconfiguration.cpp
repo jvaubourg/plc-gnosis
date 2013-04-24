@@ -50,13 +50,18 @@ NodeConfiguration::NodeConfiguration(NodeModel *node, QDialog *parent) :
     noiseSourceSettings = new QGroupBox("Noise Source");
     noiseSourceSettings->setCheckable(true);
 
+    //Noise sources disabled until we have a better idea of how they will be handled.
+    noiseSourceSettings->setDisabled(true);
+
     if(nodeModel->getNoiseSource() == 0){
         noiseSourceSettings->setChecked(false);
         nodeModel->setNoiseSource(new NoiseSourceModel());
     }
     else
     {
-        noiseSourceSettings->setChecked(true);
+        //If an old diagram file has a noise source specified, disable it
+        noiseSourceSettings->setChecked(false);
+        //noiseSourceSettings->setChecked(true);
     }
 
     QVBoxLayout* noiseSrcConfigLayout = new QVBoxLayout();

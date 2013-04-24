@@ -1,5 +1,5 @@
 #Setup required Qt modules
-QT += gui svg opengl
+QT += gui
 
 #Build template
 TEMPLATE = subdirs
@@ -12,3 +12,5 @@ SUBDIRS +=  PLCTopologyLoader \
             Launcher
 
 CONFIG += ordered
+
+NS3_DIR = .
