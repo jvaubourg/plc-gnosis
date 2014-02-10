@@ -283,7 +283,7 @@ Ptr<PLC_NoiseSource> PLCTopologyLoader::fromNoiseSourceModel(NoiseSourceModel *n
         newNoiseSource = staticNoise;
         staticNoise->Init();
         newNoiseSource->Enable();
-        //Simulator::Schedule(Seconds(0), &PLC_StaticNoiseSource::Start, PeekPointer(staticNoise), Seconds(30));
+        //Simulator::Schedule(Seconds(0), &PLC_StaticNoiseSource::Initialize, PeekPointer(staticNoise), Seconds(30));
 
     }
 

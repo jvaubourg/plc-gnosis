@@ -421,7 +421,7 @@ void PLCSimulator::simulateSINRAtReceiver(bool doPSD, bool doSINR, QString txNam
     PLC_Interference interference;
     Ptr<SpectrumValue> noiseFloor = CreateWorstCaseBgNoise(txDev->GetSpectrumModel())->GetNoisePsd();
     interference.SetNoiseFloor(noiseFloor);
-    interference.StartRx(rxPSD);
+    interference.InitializeRx(rxPSD);
 
     //ns3::Simulator::Destroy();
 
@@ -493,7 +493,7 @@ void PLCSimulator::psdTest(){
     PLC_Interference interference;
     Ptr<SpectrumValue> noiseFloor = CreateWorstCaseBgNoise(sm)->GetNoisePsd();
     interference.SetNoiseFloor(noiseFloor);
-    interference.StartRx(rxPsd);
+    interference.InitializeRx(rxPsd);
 
     //Ptr<SpectrumValue> sinr = interference.GetSINR();
 

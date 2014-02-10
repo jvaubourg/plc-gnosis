@@ -34,7 +34,7 @@ PLCSimulatorSettingsWidget::PLCSimulatorSettingsWidget(QString ns3Dir, QStringLi
     listWidgetLayout->addWidget(enabledTxNodes);
 
 
-    doCollectTransferFunctions = new QPushButton("Start", this);
+    doCollectTransferFunctions = new QPushButton("Initialize", this);
 
     ctfSettingsLayout->addLayout(listLabelsLayout);
     ctfSettingsLayout->addLayout(listWidgetLayout);
@@ -45,7 +45,7 @@ PLCSimulatorSettingsWidget::PLCSimulatorSettingsWidget(QString ns3Dir, QStringLi
 
     //ns3DirectoryEdit = new QPlainTextEdit(ns3Dir, this);
 
-    doCalculateRxPSDSINR = new QPushButton("Start", this);
+    doCalculateRxPSDSINR = new QPushButton("Initialize", this);
 
     txDropDown = new QComboBox(this);
     rxDropDown = new QComboBox(this);
