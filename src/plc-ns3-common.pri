@@ -56,7 +56,6 @@ count(LINK_NS3, 1){
                     csma \
                     stats \
                     internet \
-                    tools \
                     mobility
 
     for(module, NS3_MODULES) {
